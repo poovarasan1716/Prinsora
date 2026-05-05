@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, ShoppingBag, Star, Search, Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { formatPrice, categories } from '@/data/products';
@@ -17,12 +17,14 @@ import AppImage from '@/components/ui/AppImage';
 const GOLD = 'linear-gradient(135deg, #8B5E1A 0%, #D4A843 28%, #F5D47A 50%, #C8881E 72%, #8B5E1A 100%)';
 const BTN_GOLD = 'linear-gradient(135deg, hsl(38 70% 42%) 0%, hsl(45 80% 55%) 100%)';
 
-export default function ShopPage() {
+function ShopContent() {
   const { user } = useAuth();
   const { addItem } = useCart();
   const { toggle, isLiked } = useWishlist();
   const { toast } = useToast();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const tagFilter = searchParams.get('tag');
   const [activeCategory, setActiveCategory] = useState<string>('All');
   const [search, setSearch] = useState('');
   
@@ -42,7 +44,8 @@ export default function ShopPage() {
   const filtered = allProducts.filter(p => {
     const matchCat = activeCategory === 'All' || p.category === activeCategory;
     const matchSearch = p.name.toLowerCase().includes(search.toLowerCase());
-    return matchCat && matchSearch;
+    const matchTag = !tagFilter || (p.tag && p.tag.toLowerCase() === tagFilter.toLowerCase());
+    return matchCat && matchSearch && matchTag;
   });
 
   const handleAddToCart = (e: React.MouseEvent, product: any) => {
@@ -74,7 +77,7 @@ export default function ShopPage() {
           <motion.div className="text-center" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <p className="text-xs tracking-[0.35em] uppercase mb-3 font-semibold" style={{ color: 'hsl(45 70% 55%)' }}>Explore All</p>
             <h1 className="text-5xl md:text-6xl font-serif font-medium mb-6" style={{ background: GOLD, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-              Our Collection
+              {tagFilter ? `${tagFilter} Collection` : 'Our Collection'}
             </h1>
             <div className="w-20 h-0.5 mx-auto" style={{ background: 'linear-gradient(to right, transparent, hsl(45 70% 55%), transparent)' }} />
           </motion.div>
@@ -214,5 +217,17 @@ export default function ShopPage() {
       </div>
       <Footer />
     </div>
+  );
+}
+
+export default function ShopPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#0f0805' }}>
+        <Loader2 className="w-12 h-12 animate-spin" style={{ color: 'hsl(45 70% 55%)' }} />
+      </div>
+    }>
+      <ShopContent />
+    </Suspense>
   );
 }

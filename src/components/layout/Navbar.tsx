@@ -27,10 +27,8 @@ export function Navbar() {
   const navLinks = [
     { label: 'Home', href: '/' },
     { label: 'Shop', href: '/shop' },
-    { label: 'New Arrivals', href: '/shop' },
-    { label: 'Offers', href: '/shop' },
+    { label: 'Offers', href: '/shop?tag=Sale' },
     { label: 'Contact', href: '#footer' },
-    { label: 'Admin', href: '/admin' },
   ];
 
   return (
