@@ -10,41 +10,66 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: 'GOOGLE_APPS_SCRIPT_URL not set' }, { status: 500 });
     }
 
-    // Prepare order rows for Apps Script
-    const orderRows = cartItems.map((item: any) => [
+    // 1. Prepare Order Summary (One row)
+    const orderSummary = [
       new Date().toLocaleString(),
       orderId,
       address.fullName,
       address.phone,
       address.email,
       `${address.address}, ${address.city}, ${address.state} - ${address.pincode}`,
+      total,
+      paymentMethod,
+      'Confirmed' // Setting to Confirmed as payment is simulated as successful
+    ];
+
+    // 2. Prepare Order Items (Multiple rows)
+    const orderItems = cartItems.map((item: any) => [
+      new Date().toLocaleString(),
+      orderId,
       item.name,
+      item.size || 'N/A',
       item.quantity,
       item.price,
-      paymentMethod,
-      'Pending'
+      item.price * item.quantity
     ]);
 
-    // Send order to Apps Script Bridge
-    const response = await fetch(scriptUrl, {
+    // Send Summary to Orders Sheet
+    const summaryRes = await fetch(scriptUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        action: 'placeOrder', // The flag for the Apps Script
+        action: 'placeOrder',
         sheetId: process.env.GOOGLE_SHEET_ID,
-        orderRows,
-        cartItems // Needed for stock subtraction
+        sheetName: process.env.GOOGLE_SHEET_ORDERS_NAME || 'Orders',
+        orderRows: [orderSummary]
       }),
     });
 
-    const result = await response.json();
-    console.log('Apps Script Order Result:', result);
+    // Send Details to Order_Items Sheet
+    const itemsRes = await fetch(scriptUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'placeOrder',
+        sheetId: process.env.GOOGLE_SHEET_ID,
+        sheetName: process.env.GOOGLE_SHEET_ORDER_ITEMS_NAME || 'Order_Items',
+        orderRows: orderItems
+      }),
+    });
 
-    if (result.success) {
+    const [sumJson, itemJson] = await Promise.all([
+      summaryRes.json(),
+      itemsRes.json()
+    ]);
+
+    console.log('Summary Result:', sumJson);
+    console.log('Items Result:', itemJson);
+
+    if (sumJson.success && itemJson.success) {
       return NextResponse.json({ success: true, orderId });
     } else {
-      console.error('Apps Script Order Error Details:', result.error);
-      throw new Error(result.error || 'Order bridge failed');
+      throw new Error(sumJson.error || itemJson.error || 'Order bridge failed');
     }
 
   } catch (error: any) {

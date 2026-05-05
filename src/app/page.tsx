@@ -1,26 +1,27 @@
-import React from 'react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import HeroSection from '@/app/components/HeroSection';
-import CategoriesSection from '@/app/components/CategoriesSection';
-import FeaturedProducts from '@/app/components/FeaturedProducts';
-import NewArrivals from '@/app/components/NewArrivals';
-import OfferBanner from '@/app/components/OfferBanner';
-import Testimonials from '@/app/components/Testimonials';
-import Newsletter from '@/app/components/Newsletter';
+'use client';
 
-export default function HomePage() {
+import { Navbar } from '@/components/layout/Navbar';
+import { Footer } from '@/components/layout/Footer';
+import { Hero } from '@/components/sections/Hero';
+import { Featured } from '@/components/sections/Featured';
+import { Collections } from '@/components/sections/Collections';
+import { About } from '@/components/sections/About';
+import { Testimonials } from '@/components/sections/Testimonials';
+import { SaleCta } from '@/components/sections/SaleCta';
+
+export default function Home() {
   return (
-    <main className="min-h-screen bg-background">
-      <Header />
-      <HeroSection />
-      <CategoriesSection />
-      <FeaturedProducts />
-      <NewArrivals />
-      <OfferBanner />
-      <Testimonials />
-      <Newsletter />
+    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
+      <Navbar />
+      <main>
+        <Hero />
+        <Featured />
+        <Collections />
+        <About />
+        <Testimonials />
+        <SaleCta />
+      </main>
       <Footer />
-    </main>
+    </div>
   );
 }

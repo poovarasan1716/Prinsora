@@ -39,7 +39,7 @@
     "warning": "🚨 CRITICAL: DO NOT REMOVE OR MODIFY ABOVE DEPENDENCIES - Required for Next.js 15 TypeScript app functionality"
   },
   "scripts": {
-    "dev": "next dev -p 4028",
+    "dev": "npx kill-port 4028 && next dev -p 4028",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -51,17 +51,24 @@
   "dependencies": {
     "@dhiwise/component-tagger": "^1.0.15",
     "@heroicons/react": "^2.2.0",
+    "@radix-ui/react-toast": "^1.2.15",
+    "@radix-ui/react-tooltip": "^1.2.8",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",
     "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/typography": "^0.5.16",
+    "@tanstack/react-query": "^5.100.9",
     "@types/three": "^0.184.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
-    "lucide-react": "^1.7.0",
+    "lucide-react": "0.468.0",
     "next": "15.1.11",
     "react": "19.0.3",
     "react-dom": "19.0.3",
+    "react-icons": "^5.6.0",
     "recharts": "^2.15.2",
+    "tailwind-merge": "^3.5.0",
     "three": "^0.184.0"
   },
   "devDependencies": {

@@ -1,261 +1,147 @@
 'use client';
-import React, { useState } from 'react';
-import Link from 'next/link';
-import AppLogo from '@/components/ui/AppLogo';
-import AppImage from '@/components/ui/AppImage';
-import Icon from '@/components/ui/AppIcon';
 
-type AuthMode = 'login' | 'signup' | 'forgot';
+import { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
+import { Gem, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+
+const GOLD = 'linear-gradient(135deg, #8B5E1A 0%, #D4A843 28%, #F5D47A 50%, #C8881E 72%, #8B5E1A 100%)';
+const BTN_GOLD = 'linear-gradient(135deg, hsl(38 70% 42%) 0%, hsl(45 80% 55%) 100%)';
 
 export default function LoginPage() {
-  const [mode, setMode] = useState<AuthMode>('login');
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', confirmPassword: '' });
+  const { login } = useAuth();
+  const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPw, setShowPw] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    await new Promise((r) => setTimeout(r, 1500));
-    setIsLoading(false);
-    if (mode === 'forgot') {
-      setMode('login');
+    setError('');
+    setLoading(true);
+    const res = await login(email, password);
+    setLoading(false);
+    if (res.success) {
+      const redirect = localStorage.getItem('prinsora_redirect') || '/';
+      localStorage.removeItem('prinsora_redirect');
+      router.push(redirect);
+    } else {
+      setError(res.error || 'Login failed');
     }
   };
 
+  const inputStyle = {
+    width: '100%',
+    background: 'rgba(255,255,255,0.04)',
+    border: '1px solid hsl(45 70% 55% / 0.3)',
+    borderRadius: '8px',
+    padding: '12px 16px',
+    color: '#f5f0e8',
+    fontSize: '15px',
+    outline: 'none',
+  };
+
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Left Panel - Decorative */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-primary">
-        <div className="absolute inset-0">
-          <AppImage
-            src="https://img.rocket.new/generatedImages/rocket_gen_img_19d2be207-1777786856288.png"
-            alt="Prinsora fashion collection — elegant women's clothing"
-            fill
-            className="object-cover opacity-40" />
-          
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/80 via-primary/60 to-transparent" />
-        <div className="relative z-10 flex flex-col justify-between p-12 text-white">
-          <Link href="/" className="flex items-center gap-3">
-            <AppLogo size={40} />
-            <span className="font-display text-2xl font-semibold">Prinsora</span>
-          </Link>
-          <div>
-            <h2 className="font-display text-4xl font-semibold leading-tight mb-4">
-              Grace in<br />Every Thread
-            </h2>
-            <p className="text-white/70 text-lg leading-relaxed max-w-sm">
-              Discover curated ethnic and western wear crafted for the modern Indian woman.
-            </p>
-            <div className="mt-8 flex items-center gap-4">
-              {[
-              { label: '50K+', desc: 'Happy Customers' },
-              { label: '2K+', desc: 'Products' },
-              { label: '4.8★', desc: 'Rating' }].
-              map((stat) =>
-              <div key={stat.label} className="text-center">
-                  <p className="font-display text-2xl font-bold text-accent">{stat.label}</p>
-                  <p className="text-xs text-white/60 mt-0.5">{stat.desc}</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden" style={{ background: '#0f0805' }}>
+      <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 70% 70% at 50% 40%, hsl(38 60% 25% / 0.15), transparent)' }} />
 
-      {/* Right Panel - Form */}
-      <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-10">
-        {/* Mobile Logo */}
-        <Link href="/" className="flex items-center gap-2 mb-8 lg:hidden">
-          <AppLogo size={32} />
-          <span className="font-display text-xl font-semibold text-primary">Prinsora</span>
-        </Link>
-
-        <div className="w-full max-w-md">
-          {/* Mode Switcher */}
-          {mode !== 'forgot' &&
-          <div className="flex bg-secondary rounded-full p-1 mb-8">
-              <button
-              onClick={() => setMode('login')}
-              className={`flex-1 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${
-              mode === 'login' ? 'bg-primary text-primary-foreground shadow-md' : 'text-muted-foreground hover:text-foreground'}`
-              }>
-              
-                Sign In
-              </button>
-              <button
-              onClick={() => setMode('signup')}
-              className={`flex-1 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${
-              mode === 'signup' ? 'bg-primary text-primary-foreground shadow-md' : 'text-muted-foreground hover:text-foreground'}`
-              }>
-              
-                Create Account
-              </button>
-            </div>
-          }
-
-          <div className="animate-fade-in-up">
-            <h1 className="font-display text-3xl font-semibold text-primary mb-1">
-              {mode === 'login' ? 'Welcome back' : mode === 'signup' ? 'Join Prinsora' : 'Reset Password'}
+      <motion.div
+        className="w-full max-w-md mx-4"
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <div
+          className="rounded-2xl p-10"
+          style={{
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid hsl(45 70% 55% / 0.2)',
+            boxShadow: '0 0 60px hsl(45 70% 55% / 0.06)',
+          }}
+        >
+          <div className="text-center mb-8">
+            <Link href="/" className="inline-flex items-center gap-2 mb-6">
+              <Gem className="w-7 h-7" style={{ color: 'hsl(45 70% 55%)' }} />
+              <span className="font-serif text-2xl font-semibold" style={{ color: 'hsl(45 70% 55%)' }}>Prinsora</span>
+            </Link>
+            <h1 className="text-3xl font-serif font-medium mb-2" style={{ background: GOLD, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+              Welcome Back
             </h1>
-            <p className="text-muted-foreground text-sm mb-8">
-              {mode === 'login' ? 'Sign in to your account to continue shopping' :
-              mode === 'signup' ? 'Create your account and start exploring' : "Enter your email and we'll send you a reset link"}
-            </p>
+            <p className="text-sm" style={{ color: 'hsl(38 30% 60%)' }}>Sign in to your royal account</p>
+          </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {mode === 'signup' &&
-              <div>
-                  <label className="block text-sm font-medium mb-1.5">Full Name</label>
-                  <input
-                  required
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder="Priya Sharma"
-                  className="w-full px-4 py-3.5 bg-secondary border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent transition-all" />
-                
-                </div>
-              }
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            <div>
+              <label className="block text-xs tracking-widest uppercase mb-2 font-medium" style={{ color: 'hsl(45 70% 55%)' }}>Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                style={inputStyle}
+                required
+              />
+            </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-1.5">Email Address</label>
+            <div>
+              <label className="block text-xs tracking-widest uppercase mb-2 font-medium" style={{ color: 'hsl(45 70% 55%)' }}>Password</label>
+              <div className="relative">
                 <input
-                  required
-                  type="email"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  placeholder="priya@example.com"
-                  className="w-full px-4 py-3.5 bg-secondary border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent transition-all" />
-                
-              </div>
-
-              {mode === 'signup' &&
-              <div>
-                  <label className="block text-sm font-medium mb-1.5">Phone Number</label>
-                  <input
-                  value={form.phone}
-                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                  placeholder="+91 98765 43210"
-                  className="w-full px-4 py-3.5 bg-secondary border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent transition-all" />
-                
-                </div>
-              }
-
-              {mode !== 'forgot' &&
-              <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-sm font-medium">Password</label>
-                    {mode === 'login' &&
-                  <button
-                    type="button"
-                    onClick={() => setMode('forgot')}
-                    className="text-xs text-accent hover:underline">
-                    
-                        Forgot password?
-                      </button>
-                  }
-                  </div>
-                  <div className="relative">
-                    <input
-                    required
-                    type={showPassword ? 'text' : 'password'}
-                    value={form.password}
-                    onChange={(e) => setForm({ ...form, password: e.target.value })}
-                    placeholder="••••••••"
-                    className="w-full px-4 py-3.5 pr-12 bg-secondary border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent transition-all" />
-                  
-                    <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
-                    
-                      <Icon name={showPassword ? 'EyeSlashIcon' : 'EyeIcon'} size={18} />
-                    </button>
-                  </div>
-                </div>
-              }
-
-              {mode === 'signup' &&
-              <div>
-                  <label className="block text-sm font-medium mb-1.5">Confirm Password</label>
-                  <input
-                  required
-                  type="password"
-                  value={form.confirmPassword}
-                  onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
+                  type={showPw ? 'text' : 'password'}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full px-4 py-3.5 bg-secondary border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent transition-all" />
-                
-                </div>
-              }
-
-              {mode === 'signup' &&
-              <label className="flex items-start gap-3 cursor-pointer">
-                  <input type="checkbox" required className="mt-0.5 accent-accent" />
-                  <span className="text-xs text-muted-foreground leading-relaxed">
-                    I agree to the{' '}
-                    <Link href="/" className="text-accent hover:underline">Terms of Service</Link>
-                    {' '}and{' '}
-                    <Link href="/" className="text-accent hover:underline">Privacy Policy</Link>
-                  </span>
-                </label>
-              }
-
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full py-4 bg-primary text-primary-foreground rounded-full font-semibold hover:bg-primary/90 transition-all hover:shadow-lg flex items-center justify-center gap-2 disabled:opacity-70 mt-2">
-                
-                {isLoading ?
-                <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" /> :
-                mode === 'login' ? 'Sign In' :
-                mode === 'signup'? 'Create Account': 'Send Reset Link'
-                }
-              </button>
-
-              {mode === 'forgot' &&
-              <button
-                type="button"
-                onClick={() => setMode('login')}
-                className="w-full py-3 border border-border rounded-full text-sm font-medium hover:bg-secondary transition-colors flex items-center justify-center gap-2">
-                
-                  <Icon name="ArrowLeftIcon" size={16} />
-                  Back to Sign In
+                  style={{ ...inputStyle, paddingRight: '44px' }}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPw(!showPw)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2"
+                  style={{ color: 'hsl(45 70% 55% / 0.6)' }}
+                >
+                  {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
-              }
-            </form>
+              </div>
+            </div>
 
-            {mode !== 'forgot' &&
-            <>
-                <div className="flex items-center gap-4 my-6">
-                  <div className="flex-1 h-px bg-border" />
-                  <span className="text-xs text-muted-foreground">or continue with</span>
-                  <div className="flex-1 h-px bg-border" />
-                </div>
+            {error && (
+              <div className="flex items-center gap-2 text-sm px-3 py-2 rounded-lg" style={{ background: 'rgba(220,38,38,0.1)', border: '1px solid rgba(220,38,38,0.3)', color: '#f87171' }}>
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                {error}
+              </div>
+            )}
 
-                <div className="grid grid-cols-2 gap-3">
-                  <button className="flex items-center justify-center gap-2.5 py-3 border border-border rounded-xl text-sm font-medium hover:bg-secondary transition-colors">
-                    <svg width="18" height="18" viewBox="0 0 24 24">
-                      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                    </svg>
-                    Google
-                  </button>
-                  <button className="flex items-center justify-center gap-2.5 py-3 border border-border rounded-xl text-sm font-medium hover:bg-secondary transition-colors">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2C6.477 2 2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.879V14.89h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.989C18.343 21.129 22 16.99 22 12c0-5.523-4.477-10-10-10z" />
-                    </svg>
-                    Facebook
-                  </button>
-                </div>
-              </>
-            }
+            <motion.button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3.5 rounded-full font-semibold text-sm tracking-wider mt-2"
+              style={{ background: BTN_GOLD, color: '#1a0f08' }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              {loading ? 'Signing In…' : 'Sign In'}
+            </motion.button>
+          </form>
+
+          <div className="mt-8 text-center">
+            <p className="text-sm" style={{ color: 'hsl(38 30% 55%)' }}>
+              New to Prinsora?{' '}
+              <Link href="/signup" className="font-medium underline underline-offset-4" style={{ color: 'hsl(45 70% 60%)' }}>
+                Create an account
+              </Link>
+            </p>
           </div>
         </div>
-      </div>
-    </div>);
 
+        <p className="text-center text-xs mt-6" style={{ color: 'hsl(38 20% 45%)' }}>
+          Demo mode — any email + 6+ char password works
+        </p>
+      </motion.div>
+    </div>
+  );
 }

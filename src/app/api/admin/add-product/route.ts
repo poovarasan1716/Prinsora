@@ -28,7 +28,8 @@ export async function POST(req: NextRequest) {
         description: formData.get('description'),
         price: formData.get('price'),
         stock: formData.get('stock'),
-        category: formData.get('category')
+        category: formData.get('category'),
+        sizes: formData.get('sizes')
       }),
     });
 

@@ -1,46 +1,43 @@
-import React from 'react';
-import type { Metadata, Viewport } from 'next';
-import { Fraunces, DM_Sans } from 'next/font/google';
-import '../styles/tailwind.css';
-import { CartProvider } from '@/context/CartContext';
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import { Providers } from "@/components/Providers";
+import Script from "next/script";
 
-const fraunces = Fraunces({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700', '900'],
-  variable: '--font-fraunces',
-  display: 'swap',
-});
-
-const dmSans = DM_Sans({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-dm-sans',
-  display: 'swap',
-});
-
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-};
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
-  title: 'Prinsora — Grace in Every Thread',
-  description: 'Prinsora is a premium women\'s clothing brand offering curated ethnic and western wear — dresses, sarees, kurtis, and more delivered across India.',
-  icons: {
-    icon: [{ url: '/favicon.ico', type: 'image/x-icon' }],
-  },
+  title: "Prinsora | Luxury Fashion",
+  description: "Experience the ultimate in luxury fashion with Prinsora.",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+
   return (
-    <html lang="en" className={`${fraunces.variable} ${dmSans.variable}`} suppressHydrationWarning>
-      <body className={dmSans.className} suppressHydrationWarning>
-        <CartProvider>
-          {children}
-        </CartProvider>
+    <html lang="en">
+      <body className={inter.className}>
+        {GA_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${GA_ID}');
+              `}
+            </Script>
+          </>
+        )}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
