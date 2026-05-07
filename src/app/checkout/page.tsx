@@ -261,6 +261,34 @@ export default function CheckoutPage() {
                   </Link>
                 </div>
               </motion.div>
+            ) : placing && step === 'payment' ? (
+              <motion.div
+                key="placing"
+                className="max-w-lg mx-auto text-center py-32"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <div className="relative w-20 h-20 mx-auto mb-8">
+                  <motion.div
+                    className="absolute inset-0 rounded-full border-2 border-accent/20"
+                    animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.2, 0.5] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-10 h-10 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+                  </div>
+                </div>
+                <h2
+                  className="text-2xl font-serif font-medium mb-3"
+                  style={{ color: '#f5f0e8' }}
+                >
+                  Finalizing Order
+                </h2>
+                <p className="text-sm" style={{ color: 'hsl(38 30% 55%)' }}>
+                  Please wait while we secure your luxury selection...
+                </p>
+              </motion.div>
             ) : (
               <motion.div
                 key="checkout"

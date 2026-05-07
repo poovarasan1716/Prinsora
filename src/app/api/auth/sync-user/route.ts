@@ -12,11 +12,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    console.log(`Syncing user ${name} (${email}) to sheet: ${process.env.GOOGLE_SHEET_USERS_NAME || 'User_details'}`);
+    
     const response = await fetch(scriptUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        action: 'placeOrder', // Using the known working action for appending rows
+        action: action === 'syncUser' ? 'placeOrder' : action, // Use placeOrder as the generic append action if syncUser was requested
         sheetId: process.env.GOOGLE_SHEET_ID,
         sheetName: process.env.GOOGLE_SHEET_USERS_NAME || 'User_details',
         orderRows: [[new Date().toLocaleString(), name, email, phone || 'N/A', 'Active']],
@@ -24,6 +26,12 @@ export async function POST(req: NextRequest) {
     });
 
     const result = await response.json();
+    console.log('Sync User Result:', result);
+    
+    if (!result.success) {
+      console.error('User Sync Failed:', result.error);
+    }
+
     return NextResponse.json(result);
   } catch (error: any) {
     console.error('Sync User Error:', error);

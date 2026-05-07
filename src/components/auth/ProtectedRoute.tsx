@@ -17,13 +17,16 @@ export default function ProtectedRoute({ children, adminOnly = false }: Protecte
   useEffect(() => {
     if (!loading) {
       if (!user) {
+        console.log('ProtectedRoute: No user found, redirecting to login');
         router.push('/login');
       } else if (adminOnly) {
-        // Simple admin check: Check if email is a specific admin email
-        // In a real app, you'd use custom claims or a database role
-        const isAdmin =
-          user.email === 'admin@prinsora.com' || user.email === 'poovarasanj@gmail.com'; // Add your admin emails here
+        const adminEmails = ['admin@prinsora.com', 'poovarasanj@gmail.com'];
+        const userEmail = user.email.toLowerCase();
+        const isAdmin = adminEmails.includes(userEmail);
+        
+        console.log(`ProtectedRoute: User ${userEmail}, isAdmin: ${isAdmin}`);
         if (!isAdmin) {
+          console.log('ProtectedRoute: Access denied, redirecting to home');
           router.push('/');
         }
       }
@@ -41,7 +44,8 @@ export default function ProtectedRoute({ children, adminOnly = false }: Protecte
   if (!user) return null;
 
   if (adminOnly) {
-    const isAdmin = user.email === 'admin@prinsora.com' || user.email === 'poovarasanj@gmail.com';
+    const adminEmails = ['admin@prinsora.com', 'poovarasanj@gmail.com'];
+    const isAdmin = adminEmails.includes(user.email.toLowerCase());
     if (!isAdmin) return null;
   }
 

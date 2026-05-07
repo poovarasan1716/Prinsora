@@ -25,7 +25,17 @@ export async function GET() {
     }
 
     // Format: [Date, OrderID, Product, Size, Qty, Price, Total]
-    const items = result.products.map((row: any) => ({
+    let rawRows = result.products || [];
+
+    // Filter out header row
+    if (rawRows.length > 0) {
+      const firstRow = rawRows[0].map((c: any) => String(c).toLowerCase());
+      if (firstRow.some((c: string) => c.includes('product') || c.includes('qty') || c.includes('total'))) {
+        rawRows = rawRows.slice(1);
+      }
+    }
+
+    const items = rawRows.map((row: any) => ({
       date: row[0],
       orderId: row[1],
       productName: row[2],

@@ -8,7 +8,7 @@ export async function GET() {
       throw new Error('GOOGLE_APPS_SCRIPT_URL not set');
     }
 
-    const response = await fetch(scriptUrl, {
+    const usersRes = await fetch(scriptUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -18,20 +18,33 @@ export async function GET() {
       }),
     });
 
-    const result = await response.json();
+    const result = await usersRes.json().catch(() => ({ success: false, error: 'Bridge returned invalid response' }));
 
     if (!result.success) {
-      throw new Error(result.error || 'Failed to fetch users from bridge');
+      console.error('Users Bridge Error:', result.error);
+      return NextResponse.json({ success: false, error: result.error || 'Failed to fetch users' }, { status: 500 });
     }
 
     // Format: [Timestamp, Name, Email, Phone, Status]
-    const users = result.products.map((row: any) => ({
-      timestamp: row[0],
-      name: row[1],
-      email: row[2],
-      phone: row[3],
-      status: row[4],
-    }));
+    let rawRows = result.products || result.orders || [];
+    
+    // Filter out header row
+    if (rawRows.length > 0 && Array.isArray(rawRows[0])) {
+      const firstRow = rawRows[0].map((c: any) => String(c).toLowerCase());
+      if (firstRow.some((c: string) => c.includes('name') || c.includes('email') || c.includes('timestamp'))) {
+        rawRows = rawRows.slice(1);
+      }
+    }
+
+    const users = rawRows
+      .filter((row: any) => Array.isArray(row) && row.length >= 2)
+      .map((row: any) => ({
+        timestamp: row[0],
+        name: row[1] || 'Unnamed User',
+        email: row[2] || 'N/A',
+        phone: row[3] || 'N/A',
+        status: row[4] || 'Active',
+      }));
 
     return NextResponse.json({ success: true, users });
   } catch (error: any) {

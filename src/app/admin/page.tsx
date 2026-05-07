@@ -67,6 +67,11 @@ export default function AdminPanel() {
       setProducts(data.products || []);
     } catch (err) {
       console.error('Failed to fetch products');
+      toast({
+        title: 'Fetch Error',
+        description: 'Failed to load inventory from Google Sheets.',
+        variant: 'destructive',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -103,6 +108,11 @@ export default function AdminPanel() {
       if (data.success) setOrders(data.orders);
     } catch (err) {
       console.error('Failed to fetch orders');
+      toast({
+        title: 'Fetch Error',
+        description: 'Failed to load orders from Google Sheets.',
+        variant: 'destructive',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -116,6 +126,11 @@ export default function AdminPanel() {
       if (data.success) setUsers(data.users);
     } catch (err) {
       console.error('Failed to fetch users');
+      toast({
+        title: 'Fetch Error',
+        description: 'Failed to load user data from Google Sheets.',
+        variant: 'destructive',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -175,11 +190,21 @@ export default function AdminPanel() {
       });
       const data = await res.json();
       if (data.success) {
+        // Optimistically update the local state to show the change immediately
+        setProducts(prevProducts => prevProducts.map(p => {
+          if (p.id === product.id) {
+            return {
+              ...p,
+              tag: action === 'add' ? offerTag : null
+            };
+          }
+          return p;
+        }));
+
         toast({
           title: action === 'add' ? 'Offer Added' : 'Offer Removed',
           description: `${product.name} has been ${action === 'add' ? 'added to' : 'removed from'} offers.`,
         });
-        fetchProducts(); // Refresh list
       } else {
         toast({
           title: 'Action Failed',
