@@ -15,7 +15,7 @@ export async function GET() {
       body: JSON.stringify({
         action: 'getSheetData',
         sheetId: process.env.GOOGLE_SHEET_ID,
-        sheetName: process.env.GOOGLE_SHEET_NAME
+        sheetName: process.env.GOOGLE_SHEET_NAME,
       }),
     });
 
@@ -25,10 +25,38 @@ export async function GET() {
       throw new Error(result.error || 'Failed to fetch products from bridge');
     }
 
+    // Fetch Offers data
+    const offersRes = await fetch(scriptUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'getSheetData',
+        sheetId: process.env.GOOGLE_SHEET_ID,
+        sheetName: process.env.GOOGLE_SHEET_OFFERS_NAME || 'Offer_product',
+      }),
+    });
+    const offersResult = await offersRes.json();
+    const offerRows = offersResult.success ? (offersResult.products || []) : [];
+    
+    // Create a map of product ID -> offer tag
+    const offerMap: Record<string, string> = {};
+    offerRows.forEach((row: any) => {
+      if (row[0] && row[0] !== 'ID') {
+        offerMap[row[0].toString()] = row[2] || 'Offer';
+      }
+    });
+
     // Filter out header row if present (checking if first column is "Name" or "ID" or similar)
+    // Filter out header row if present
     let rawRows = result.products || [];
-    if (rawRows.length > 0 && (rawRows[0][0] === 'ID' || rawRows[0][1] === 'Name' || rawRows[0][1] === 'name')) {
-      rawRows = rawRows.slice(1);
+    if (rawRows.length > 0) {
+      const firstRow = rawRows[0].map((c: any) => String(c).toLowerCase());
+      const isHeader = firstRow.some((c: string) => 
+        c.includes('id') || c.includes('name') || c.includes('url') || c.includes('price') || c.includes('description')
+      );
+      if (isHeader) {
+        rawRows = rawRows.slice(1);
+      }
     }
 
     // Map the raw sheet rows to product objects
@@ -36,7 +64,7 @@ export async function GET() {
       const getGoogleDriveDirectLink = (url: string) => {
         if (!url) return '';
         if (typeof url !== 'string') return '';
-        
+
         if (url.includes('drive.google.com') || url.includes('docs.google.com')) {
           const match = url.match(/[-\w]{25,}/);
           if (match) {
@@ -59,7 +87,10 @@ export async function GET() {
         originalPrice: price * 1.2,
         stock: parseInt(row[4]) || 0,
         category: row[5] || 'General',
-        sizes: (row[6] || 'XS, S, M, L, XL').toString().split(',').map((s: string) => s.trim()),
+        sizes: (row[6] || 'XS, S, M, L, XL')
+          .toString()
+          .split(',')
+          .map((s: string) => s.trim()),
         image: getGoogleDriveDirectLink(row[7]),
         avatar: getGoogleDriveDirectLink(row[8]),
         rating: 4.5 + Math.random() * 0.5,
@@ -72,29 +103,45 @@ export async function GET() {
 
     // Import local products for enrichment
     const { products: localProducts } = require('@/data/products');
-    
-    // Merge: Prefer local assets for seed products (ID 1-10) to ensure images always show
+
+    // Merge: Prefer local assets for seed products (ID 1-10) and apply Offers from the sheet
     const products = sheetProducts.map((p: any) => {
       const local = localProducts.find((lp: any) => lp.id === p.id);
-      if (local) {
-        return {
-          ...p,
-          name: p.name === 'Unnamed Product' || !p.name ? local.name : p.name,
-          description: !p.description ? local.description : p.description,
-          image: local.image || p.image, // Prefer local asset image for reliability
-          tag: local.tag || p.tag,
-          rating: local.rating || p.rating,
-          reviews: local.reviews || p.reviews,
-        };
+      const offerTag = offerMap[p.id];
+      
+      const merged = local ? {
+        ...p,
+        name: p.name === 'Unnamed Product' || !p.name ? local.name : p.name,
+        description: !p.description ? local.description : p.description,
+        image: local.image || p.image,
+        tag: local.tag || p.tag,
+        rating: local.rating || p.rating,
+        reviews: local.reviews || p.reviews,
+      } : p;
+
+      // Final step: If there's an offer in the Offer_product sheet, it overrides any other tag
+      if (offerTag) {
+        merged.tag = offerTag;
+        
+        // Dynamic Price Reduction Logic
+        const percentageMatch = offerTag.match(/(\d+)%/);
+        if (percentageMatch) {
+          const discountPercent = parseInt(percentageMatch[1]);
+          if (discountPercent > 0 && discountPercent < 100) {
+            // Keep current price as original, and calculate new reduced price
+            merged.originalPrice = merged.price;
+            merged.price = Math.round(merged.price * (1 - discountPercent / 100));
+          }
+        }
       }
-      return p;
+      
+      return merged;
     });
 
     // If sheet is empty, use local products as fallback
     const finalProducts = products.length > 0 ? products : localProducts;
 
     return NextResponse.json({ products: finalProducts });
-
   } catch (error: any) {
     console.error('Fetch Products Error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });

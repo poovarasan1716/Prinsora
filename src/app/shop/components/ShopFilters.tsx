@@ -23,16 +23,18 @@ export default function ShopFilters() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const toggleSize = (s: string) =>
-    setSelectedSizes((prev) => prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]);
+    setSelectedSizes((prev) => (prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]));
 
   const toggleColor = (c: string) =>
-    setSelectedColors((prev) => prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]);
+    setSelectedColors((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]));
 
   const filterContent = (
     <div className="space-y-8">
       {/* Category */}
       <div>
-        <h3 className="font-semibold text-sm text-foreground uppercase tracking-wide mb-4">Category</h3>
+        <h3 className="font-semibold text-sm text-foreground uppercase tracking-wide mb-4">
+          Category
+        </h3>
         <div className="space-y-1">
           {categories.map((cat) => (
             <button
@@ -40,7 +42,8 @@ export default function ShopFilters() {
               onClick={() => setSelectedCategory(cat)}
               className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                 selectedCategory === cat
-                  ? 'bg-primary text-white' :'text-foreground hover:bg-secondary hover:text-primary'
+                  ? 'bg-primary text-white'
+                  : 'text-foreground hover:bg-secondary hover:text-primary'
               }`}
             >
               {cat}
@@ -81,7 +84,8 @@ export default function ShopFilters() {
               onClick={() => toggleSize(size)}
               className={`w-10 h-10 rounded-lg text-sm font-medium border transition-all duration-200 ${
                 selectedSizes.includes(size)
-                  ? 'bg-primary text-white border-primary' :'bg-white text-foreground border-border hover:border-accent hover:text-accent'
+                  ? 'bg-primary text-white border-primary'
+                  : 'bg-white text-foreground border-border hover:border-accent hover:text-accent'
               }`}
             >
               {size}
@@ -92,7 +96,9 @@ export default function ShopFilters() {
 
       {/* Color */}
       <div>
-        <h3 className="font-semibold text-sm text-foreground uppercase tracking-wide mb-4">Color</h3>
+        <h3 className="font-semibold text-sm text-foreground uppercase tracking-wide mb-4">
+          Color
+        </h3>
         <div className="flex flex-wrap gap-3">
           {colors.map((color) => (
             <button
@@ -100,7 +106,9 @@ export default function ShopFilters() {
               onClick={() => toggleColor(color.name)}
               title={color.name}
               className={`w-8 h-8 rounded-full transition-all duration-200 ${
-                selectedColors.includes(color.name) ? 'ring-2 ring-offset-2 ring-accent scale-110' : 'hover:scale-105'
+                selectedColors.includes(color.name)
+                  ? 'ring-2 ring-offset-2 ring-accent scale-110'
+                  : 'hover:scale-105'
               } ${color.border ? 'border border-border' : ''}`}
               style={{ backgroundColor: color.hex }}
               aria-label={color.name}

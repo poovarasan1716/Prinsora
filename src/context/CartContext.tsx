@@ -27,7 +27,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     try {
       const stored = localStorage.getItem('prinsora_cart');
       return stored ? JSON.parse(stored) : [];
-    } catch { return []; }
+    } catch {
+      return [];
+    }
   });
 
   const save = (newItems: CartItem[]) => {
@@ -36,29 +38,37 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const addItem = (product: Product, size = 'M') => {
-    const existing = items.find(i => i.id === product.id && i.size === size);
+    const existing = items.find((i) => i.id === product.id && i.size === size);
     if (existing) {
-      save(items.map(i =>
-        i.id === product.id && i.size === size ? { ...i, quantity: i.quantity + 1 } : i
-      ));
+      save(
+        items.map((i) =>
+          i.id === product.id && i.size === size ? { ...i, quantity: i.quantity + 1 } : i
+        )
+      );
     } else {
-      save([...items, {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        image: product.image,
-        quantity: 1,
-        size,
-      }]);
+      save([
+        ...items,
+        {
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          image: product.image,
+          quantity: 1,
+          size,
+        },
+      ]);
     }
   };
 
   const removeItem = (id: string, size: string) =>
-    save(items.filter(i => !(i.id === id && i.size === size)));
+    save(items.filter((i) => !(i.id === id && i.size === size)));
 
   const updateQuantity = (id: string, size: string, qty: number) => {
-    if (qty <= 0) { removeItem(id, size); return; }
-    save(items.map(i => i.id === id && i.size === size ? { ...i, quantity: qty } : i));
+    if (qty <= 0) {
+      removeItem(id, size);
+      return;
+    }
+    save(items.map((i) => (i.id === id && i.size === size ? { ...i, quantity: qty } : i)));
   };
 
   const clearCart = () => save([]);
@@ -67,7 +77,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const count = items.reduce((sum, i) => sum + i.quantity, 0);
 
   return (
-    <CartContext.Provider value={{ items, addItem, removeItem, updateQuantity, clearCart, total, count }}>
+    <CartContext.Provider
+      value={{ items, addItem, removeItem, updateQuantity, clearCart, total, count }}
+    >
       {children}
     </CartContext.Provider>
   );

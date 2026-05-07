@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
@@ -42,19 +44,19 @@ export function Navbar() {
       <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 group" data-testid="link-logo">
-          <Gem className="w-8 h-8 text-primary" />
-          <span className="font-serif text-2xl md:text-3xl font-semibold tracking-wide text-primary group-hover:text-accent transition-colors">
+          <Gem className="w-10 h-10 text-primary" />
+          <span className="font-serif text-3xl md:text-4xl font-semibold tracking-wide text-primary group-hover:text-accent transition-colors">
             Prinsora
           </span>
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-10">
           {navLinks.map((item) => (
             <Link
               key={item.label}
               href={item.href}
-              className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors tracking-wide relative group"
+              className="text-lg font-medium text-foreground/80 hover:text-primary transition-colors tracking-wide relative group"
             >
               {item.label}
               <span className="absolute -bottom-0.5 left-0 w-0 h-px bg-primary group-hover:w-full transition-all duration-300" />
@@ -75,7 +77,10 @@ export function Navbar() {
             <button className="relative text-foreground/70 hover:text-primary transition-colors hover:scale-110 duration-200">
               <Heart className="w-5 h-5" />
               {wishlistCount > 0 && (
-                <span className="absolute -top-2 -right-2 w-4 h-4 rounded-full text-[10px] font-bold flex items-center justify-center" style={{ background: 'hsl(45 70% 55%)', color: '#1a0f08' }}>
+                <span
+                  className="absolute -top-2 -right-2 w-4 h-4 rounded-full text-[10px] font-bold flex items-center justify-center"
+                  style={{ background: 'hsl(45 70% 55%)', color: '#1a0f08' }}
+                >
                   {wishlistCount}
                 </span>
               )}
@@ -87,7 +92,10 @@ export function Navbar() {
             <button className="relative text-foreground/70 hover:text-primary transition-colors hover:scale-110 duration-200">
               <ShoppingBag className="w-5 h-5" />
               {cartCount > 0 && (
-                <span className="absolute -top-2 -right-2 w-4 h-4 rounded-full text-[10px] font-bold flex items-center justify-center" style={{ background: 'hsl(45 70% 55%)', color: '#1a0f08' }}>
+                <span
+                  className="absolute -top-2 -right-2 w-4 h-4 rounded-full text-[10px] font-bold flex items-center justify-center"
+                  style={{ background: 'hsl(45 70% 55%)', color: '#1a0f08' }}
+                >
                   {cartCount}
                 </span>
               )}
@@ -98,14 +106,23 @@ export function Navbar() {
           {user ? (
             <div className="flex items-center gap-3">
               <Link href="/profile">
-                <button className="flex items-center gap-1.5 text-sm font-medium transition-colors hover:text-primary" style={{ color: 'hsl(45 70% 55%)' }}>
-                  <span className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'hsl(45 70% 55%)', color: '#1a0f08' }}>
+                <button
+                  className="flex items-center gap-1.5 text-sm font-medium transition-colors hover:text-primary"
+                  style={{ color: 'hsl(45 70% 55%)' }}
+                >
+                  <span
+                    className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
+                    style={{ background: 'hsl(45 70% 55%)', color: '#1a0f08' }}
+                  >
                     {user.name[0].toUpperCase()}
                   </span>
                 </button>
               </Link>
               <button
-                onClick={() => { logout(); router.push('/'); }}
+                onClick={() => {
+                  logout();
+                  router.push('/');
+                }}
                 className="text-foreground/50 hover:text-red-400 transition-colors"
                 title="Sign out"
               >
@@ -155,7 +172,12 @@ export function Navbar() {
                   <div className="relative">
                     <ShoppingBag className="w-5 h-5 text-foreground hover:text-primary" />
                     {cartCount > 0 && (
-                      <span className="absolute -top-2 -right-2 w-4 h-4 rounded-full text-[10px] font-bold flex items-center justify-center" style={{ background: 'hsl(45 70% 55%)', color: '#1a0f08' }}>{cartCount}</span>
+                      <span
+                        className="absolute -top-2 -right-2 w-4 h-4 rounded-full text-[10px] font-bold flex items-center justify-center"
+                        style={{ background: 'hsl(45 70% 55%)', color: '#1a0f08' }}
+                      >
+                        {cartCount}
+                      </span>
                     )}
                   </div>
                 </Link>

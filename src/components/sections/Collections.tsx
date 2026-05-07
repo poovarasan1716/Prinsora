@@ -5,7 +5,8 @@ import col1 from '@/assets/images/collection-1.png';
 import col2 from '@/assets/images/collection-2.png';
 import col3 from '@/assets/images/collection-3.png';
 
-const GOLD = 'linear-gradient(135deg, #8B5E1A 0%, #D4A843 28%, #F5D47A 50%, #C8881E 72%, #8B5E1A 100%)';
+const GOLD =
+  'linear-gradient(135deg, #8B5E1A 0%, #D4A843 28%, #F5D47A 50%, #C8881E 72%, #8B5E1A 100%)';
 
 const collections = [
   { id: 1, name: 'Royal', tagline: 'Timeless Grandeur', category: 'Saree', image: col1 },
@@ -21,7 +22,10 @@ export function Collections() {
       {/* Subtle gold radial glow top-left */}
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 60% 50% at 10% 20%, hsl(45 90% 60% / 0.06), transparent)' }}
+        style={{
+          background:
+            'radial-gradient(ellipse 60% 50% at 10% 20%, hsl(45 90% 60% / 0.06), transparent)',
+        }}
       />
       <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-yellow-400/40 to-transparent" />
 
@@ -33,7 +37,10 @@ export function Collections() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <p className="text-xs tracking-[0.35em] uppercase mb-3 font-semibold" style={{ color: 'hsl(38 80% 45%)' }}>
+          <p
+            className="text-xs tracking-[0.35em] uppercase mb-3 font-semibold"
+            style={{ color: 'hsl(38 80% 45%)' }}
+          >
             Explore the Range
           </p>
           <h2
@@ -50,7 +57,9 @@ export function Collections() {
           </h2>
           <div
             className="w-20 h-0.5 mx-auto mt-6"
-            style={{ background: 'linear-gradient(to right, transparent, hsl(45 70% 55%), transparent)' }}
+            style={{
+              background: 'linear-gradient(to right, transparent, hsl(45 70% 55%), transparent)',
+            }}
           />
         </motion.div>
 
@@ -84,7 +93,8 @@ export function Collections() {
               <div
                 className="absolute inset-0 transition-all duration-400"
                 style={{
-                  background: 'linear-gradient(to top, rgba(15,8,2,0.85) 0%, rgba(15,8,2,0.1) 45%, transparent 100%)',
+                  background:
+                    'linear-gradient(to top, rgba(15,8,2,0.85) 0%, rgba(15,8,2,0.1) 45%, transparent 100%)',
                 }}
               />
 
@@ -110,10 +120,10 @@ export function Collections() {
                 >
                   {col.name}
                 </h3>
-                <div
-                  className="mt-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-75"
-                >
-                  <span className="text-sm font-medium" style={{ color: 'hsl(45 90% 65%)' }}>Explore</span>
+                <div className="mt-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-75">
+                  <span className="text-sm font-medium" style={{ color: 'hsl(45 90% 65%)' }}>
+                    Explore
+                  </span>
                   <div className="h-px w-8" style={{ background: 'hsl(45 90% 65%)' }} />
                 </div>
               </div>
@@ -131,7 +141,11 @@ export function Collections() {
               color: 'hsl(38 70% 40%)',
               background: 'transparent',
             }}
-            whileHover={{ background: 'hsl(45 70% 55% / 0.08)', borderColor: 'hsl(45 70% 55%)', scale: 1.02 }}
+            whileHover={{
+              background: 'hsl(45 70% 55% / 0.08)',
+              borderColor: 'hsl(45 70% 55%)',
+              scale: 1.02,
+            }}
             whileTap={{ scale: 0.98 }}
           >
             Shop All Collections

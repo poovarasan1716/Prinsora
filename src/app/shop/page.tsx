@@ -14,7 +14,8 @@ import { useWishlist } from '@/context/WishlistContext';
 import { useToast } from '@/hooks/use-toast';
 import AppImage from '@/components/ui/AppImage';
 
-const GOLD = 'linear-gradient(135deg, #8B5E1A 0%, #D4A843 28%, #F5D47A 50%, #C8881E 72%, #8B5E1A 100%)';
+const GOLD =
+  'linear-gradient(135deg, #8B5E1A 0%, #D4A843 28%, #F5D47A 50%, #C8881E 72%, #8B5E1A 100%)';
 const BTN_GOLD = 'linear-gradient(135deg, hsl(38 70% 42%) 0%, hsl(45 80% 55%) 100%)';
 
 function ShopContent() {
@@ -27,24 +28,41 @@ function ShopContent() {
   const tagFilter = searchParams.get('tag');
   const [activeCategory, setActiveCategory] = useState<string>('All');
   const [search, setSearch] = useState('');
-  
+
   const [allProducts, setAllProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetch('/api/products')
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         if (data.products) setAllProducts(data.products);
       })
-      .catch(err => console.error('Failed to fetch shop products:', err))
+      .catch((err) => console.error('Failed to fetch shop products:', err))
       .finally(() => setIsLoading(false));
   }, []);
 
-  const filtered = allProducts.filter(p => {
-    const matchCat = activeCategory === 'All' || p.category === activeCategory;
-    const matchSearch = p.name.toLowerCase().includes(search.toLowerCase());
-    const matchTag = !tagFilter || (p.tag && p.tag.toLowerCase() === tagFilter.toLowerCase());
+  const filtered = allProducts.filter((p) => {
+    const pCategory = p.category?.toLowerCase().trim() || '';
+    const pName = p.name?.toLowerCase().trim() || '';
+    const activeCatLower = activeCategory.toLowerCase().trim();
+
+    // Smart match: Check if product category contains active category OR vice-versa
+    // This handles "Saree" vs "Sarees" and "Jewelry" vs "Jewellery"
+    const matchCat = 
+      activeCategory === 'All' || 
+      pCategory.includes(activeCatLower) || 
+      activeCatLower.includes(pCategory);
+    const matchSearch =
+      pName.includes(search.toLowerCase()) || pCategory.includes(search.toLowerCase());
+    // Smart Tag Match: If filtering for "Sale", show anything with %, OFF, or Sale
+    const isOfferFilter = tagFilter?.toLowerCase() === 'sale' || tagFilter?.toLowerCase() === 'offer';
+    const matchTag = !tagFilter || 
+      (p.tag && (
+        p.tag.toLowerCase() === tagFilter.toLowerCase() || 
+        (isOfferFilter && (p.tag.includes('%') || p.tag.toLowerCase().includes('off') || p.tag.toLowerCase().includes('sale')))
+      ));
+
     return matchCat && matchSearch && matchTag;
   });
 
@@ -58,14 +76,20 @@ function ShopContent() {
       return;
     }
     addItem(product);
-    toast({ title: '✦ Added to Cart', description: `${product.name} has been added to your cart.` });
+    toast({
+      title: '✦ Added to Cart',
+      description: `${product.name} has been added to your cart.`,
+    });
   };
 
   const handleWishlist = (e: React.MouseEvent, id: string) => {
     e.preventDefault();
     e.stopPropagation();
     toggle(id);
-    toast({ title: isLiked(id) ? 'Removed from Wishlist' : '♡ Added to Wishlist', description: '' });
+    toast({
+      title: isLiked(id) ? 'Removed from Wishlist' : '♡ Added to Wishlist',
+      description: '',
+    });
   };
 
   return (
@@ -74,12 +98,34 @@ function ShopContent() {
       <div className="pt-24 pb-20">
         {/* Header */}
         <div className="container mx-auto px-4 md:px-6 mb-12">
-          <motion.div className="text-center" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <p className="text-xs tracking-[0.35em] uppercase mb-3 font-semibold" style={{ color: 'hsl(45 70% 55%)' }}>Explore All</p>
-            <h1 className="text-5xl md:text-6xl font-serif font-medium mb-6" style={{ background: GOLD, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+          <motion.div
+            className="text-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <p
+              className="text-xs tracking-[0.35em] uppercase mb-3 font-semibold"
+              style={{ color: 'hsl(45 70% 55%)' }}
+            >
+              Explore All
+            </p>
+            <h1
+              className="text-5xl md:text-6xl font-serif font-medium mb-6"
+              style={{
+                background: GOLD,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}
+            >
               {tagFilter ? `${tagFilter} Collection` : 'Our Collection'}
             </h1>
-            <div className="w-20 h-0.5 mx-auto" style={{ background: 'linear-gradient(to right, transparent, hsl(45 70% 55%), transparent)' }} />
+            <div
+              className="w-20 h-0.5 mx-auto"
+              style={{
+                background: 'linear-gradient(to right, transparent, hsl(45 70% 55%), transparent)',
+              }}
+            />
           </motion.div>
         </div>
 
@@ -87,30 +133,41 @@ function ShopContent() {
           {/* Filters */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-10">
             <div className="flex flex-wrap gap-3">
-              {categories.map(cat => (
+              {categories.map((cat) => (
                 <button
                   key={cat}
-                  onClick={() => setActiveCategory(cat)}
-                  className="px-5 py-2 rounded-full text-sm font-medium transition-all duration-200"
-                  style={activeCategory === cat ? {
-                    background: BTN_GOLD,
-                    color: '#1a0f08',
-                  } : {
-                    border: '1px solid hsl(45 70% 55% / 0.35)',
-                    color: 'hsl(45 70% 60%)',
-                    background: 'transparent',
+                  onClick={() => {
+                    setActiveCategory(cat);
+                    setSearch('');
+                    if (tagFilter) router.push('/shop'); // Clear the ?tag= filter
                   }}
+                  className="px-5 py-2 rounded-full text-sm font-medium transition-all duration-200"
+                  style={
+                    activeCategory === cat
+                      ? {
+                          background: BTN_GOLD,
+                          color: '#1a0f08',
+                        }
+                      : {
+                          border: '1px solid hsl(45 70% 55% / 0.35)',
+                          color: 'hsl(45 70% 60%)',
+                          background: 'transparent',
+                        }
+                  }
                 >
                   {cat}
                 </button>
               ))}
             </div>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'hsl(45 70% 55% / 0.6)' }} />
+              <Search
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
+                style={{ color: 'hsl(45 70% 55% / 0.6)' }}
+              />
               <input
                 type="text"
                 value={search}
-                onChange={e => setSearch(e.target.value)}
+                onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search products..."
                 className="pl-9 pr-4 py-2.5 rounded-full text-sm outline-none w-64"
                 style={{
@@ -158,21 +215,32 @@ function ShopContent() {
                           />
                           <div className="absolute inset-0 bg-black/20 group-hover:bg-black/5 transition-colors" />
                           {product.tag && (
-                            <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-bold" style={{ background: BTN_GOLD, color: '#1a0f08' }}>
+                            <span
+                              className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-bold"
+                              style={{ background: BTN_GOLD, color: '#1a0f08' }}
+                            >
                               {product.tag}
                             </span>
                           )}
                           <div className="absolute top-3 right-3 flex flex-col gap-2">
                             <motion.button
-                              onClick={e => handleWishlist(e, product.id)}
+                              onClick={(e) => handleWishlist(e, product.id)}
                               className="w-9 h-9 rounded-full flex items-center justify-center"
-                              style={{ background: 'rgba(15,8,5,0.8)', backdropFilter: 'blur(8px)', border: '1px solid hsl(45 70% 55% / 0.3)' }}
+                              style={{
+                                background: 'rgba(15,8,5,0.8)',
+                                backdropFilter: 'blur(8px)',
+                                border: '1px solid hsl(45 70% 55% / 0.3)',
+                              }}
                               whileHover={{ scale: 1.1 }}
                               whileTap={{ scale: 0.9 }}
                             >
                               <Heart
                                 className="w-4 h-4"
-                                style={isLiked(product.id) ? { fill: 'hsl(45 70% 55%)', color: 'hsl(45 70% 55%)' } : { color: 'hsl(45 70% 55%)' }}
+                                style={
+                                  isLiked(product.id)
+                                    ? { fill: 'hsl(45 70% 55%)', color: 'hsl(45 70% 55%)' }
+                                    : { color: 'hsl(45 70% 55%)' }
+                                }
                               />
                             </motion.button>
                           </div>
@@ -180,15 +248,42 @@ function ShopContent() {
 
                         <div className="p-5">
                           <div className="flex items-center gap-1 mb-2">
-                            <Star className="w-3.5 h-3.5" style={{ fill: 'hsl(38 80% 55%)', color: 'hsl(38 80% 55%)' }} />
-                            <span className="text-xs font-medium" style={{ color: 'hsl(38 70% 60%)' }}>{product.rating?.toFixed(1) || '4.5'} ({product.reviews || 0})</span>
+                            <Star
+                              className="w-3.5 h-3.5"
+                              style={{ fill: 'hsl(38 80% 55%)', color: 'hsl(38 80% 55%)' }}
+                            />
+                            <span
+                              className="text-xs font-medium"
+                              style={{ color: 'hsl(38 70% 60%)' }}
+                            >
+                              {product.rating?.toFixed(1) || '4.5'} ({product.reviews || 0})
+                            </span>
                           </div>
-                          <h3 className="font-serif text-base font-semibold mb-1" style={{ color: '#f5f0e8' }}>{product.name}</h3>
-                          <p className="text-xs mb-4" style={{ color: 'hsl(38 30% 55%)' }}>{product.category}</p>
+                          <h3
+                            className="font-serif text-base font-semibold mb-1"
+                            style={{ color: '#f5f0e8' }}
+                          >
+                            {product.name}
+                          </h3>
+                          <p className="text-xs mb-4" style={{ color: 'hsl(38 30% 55%)' }}>
+                            {product.category}
+                          </p>
                           <div className="flex items-center justify-between">
-                            <span className="text-lg font-semibold" style={{ color: 'hsl(45 75% 58%)' }}>{formatPrice(product.price)}</span>
+                           <div className="flex flex-col">
+                              {product.originalPrice && product.originalPrice > product.price && (
+                                <span className="text-[10px] line-through opacity-50" style={{ color: 'hsl(45 75% 58%)' }}>
+                                  {formatPrice(product.originalPrice)}
+                                </span>
+                              )}
+                              <span
+                                className="text-lg font-semibold"
+                                style={{ color: 'hsl(45 75% 58%)' }}
+                              >
+                                {formatPrice(product.price)}
+                              </span>
+                            </div>
                             <motion.button
-                              onClick={e => handleAddToCart(e, product)}
+                              onClick={(e) => handleAddToCart(e, product)}
                               className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold"
                               style={{ background: BTN_GOLD, color: '#1a0f08' }}
                               whileHover={{ scale: 1.05 }}
@@ -209,8 +304,12 @@ function ShopContent() {
 
           {!isLoading && filtered.length === 0 && (
             <div className="text-center py-20">
-              <p className="text-xl font-serif mb-2" style={{ color: 'hsl(45 70% 55%)' }}>No products found</p>
-              <p className="text-sm" style={{ color: 'hsl(38 30% 50%)' }}>Try a different category or search term</p>
+              <p className="text-xl font-serif mb-2" style={{ color: 'hsl(45 70% 55%)' }}>
+                No products found
+              </p>
+              <p className="text-sm" style={{ color: 'hsl(38 30% 50%)' }}>
+                Try a different category or search term
+              </p>
             </div>
           )}
         </div>
@@ -222,11 +321,16 @@ function ShopContent() {
 
 export default function ShopPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#0f0805' }}>
-        <Loader2 className="w-12 h-12 animate-spin" style={{ color: 'hsl(45 70% 55%)' }} />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div
+          className="min-h-screen flex items-center justify-center"
+          style={{ background: '#0f0805' }}
+        >
+          <Loader2 className="w-12 h-12 animate-spin" style={{ color: 'hsl(45 70% 55%)' }} />
+        </div>
+      }
+    >
       <ShopContent />
     </Suspense>
   );

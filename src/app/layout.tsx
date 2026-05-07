@@ -1,14 +1,14 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import { Providers } from "@/components/Providers";
-import Script from "next/script";
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import { Providers } from '@/components/Providers';
+import Script from 'next/script';
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: "Prinsora | Luxury Fashion",
-  description: "Experience the ultimate in luxury fashion with Prinsora.",
+  title: 'Prinsora | Luxury Fashion',
+  description: 'Experience the ultimate in luxury fashion with Prinsora.',
 };
 
 export default function RootLayout({
@@ -20,7 +20,7 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={inter.className} suppressHydrationWarning>
         {GA_ID && (
           <>
             <Script
@@ -37,6 +37,7 @@ export default function RootLayout({
             </Script>
           </>
         )}
+        <Script src="https://sdk.cashfree.com/js/v3/cashfree.js" strategy="lazyOnload" />
         <Providers>{children}</Providers>
       </body>
     </html>

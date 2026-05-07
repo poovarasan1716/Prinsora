@@ -2,9 +2,21 @@ import { motion } from 'framer-motion';
 import { Gem, Leaf, Award } from 'lucide-react';
 
 const pillars = [
-  { icon: Gem, title: 'Artisan Craft', desc: 'Every piece is handcrafted by master weavers with generations of textile heritage.' },
-  { icon: Leaf, title: 'Ethically Sourced', desc: 'We partner with sustainable farms and cooperatives to honor both craft and planet.' },
-  { icon: Award, title: 'Uncompromised Quality', desc: 'From silk threads to final stitches, every detail passes our 47-point quality check.' },
+  {
+    icon: Gem,
+    title: 'Artisan Craft',
+    desc: 'Every piece is handcrafted by master weavers with generations of textile heritage.',
+  },
+  {
+    icon: Leaf,
+    title: 'Ethically Sourced',
+    desc: 'We partner with sustainable farms and cooperatives to honor both craft and planet.',
+  },
+  {
+    icon: Award,
+    title: 'Uncompromised Quality',
+    desc: 'From silk threads to final stitches, every detail passes our 47-point quality check.',
+  },
 ];
 
 export function About() {
@@ -12,7 +24,10 @@ export function About() {
     <section className="py-24 relative overflow-hidden" style={{ background: '#fdfaf4' }}>
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 55% 60% at 90% 10%, hsl(45 80% 60% / 0.07), transparent)' }}
+        style={{
+          background:
+            'radial-gradient(ellipse 55% 60% at 90% 10%, hsl(45 80% 60% / 0.07), transparent)',
+        }}
       />
       <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-yellow-500/35 to-transparent" />
 
@@ -24,13 +39,17 @@ export function About() {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <p className="text-xs tracking-[0.35em] uppercase mb-4 font-semibold" style={{ color: 'hsl(38 80% 45%)' }}>
+            <p
+              className="text-xs tracking-[0.35em] uppercase mb-4 font-semibold"
+              style={{ color: 'hsl(38 80% 45%)' }}
+            >
               Our Story
             </p>
             <h2
               className="text-4xl md:text-6xl font-serif font-medium leading-tight mb-6"
               style={{
-                background: 'linear-gradient(135deg, #8B5E1A 0%, #D4A843 28%, #F5D47A 50%, #C8881E 72%, #8B5E1A 100%)',
+                background:
+                  'linear-gradient(135deg, #8B5E1A 0%, #D4A843 28%, #F5D47A 50%, #C8881E 72%, #8B5E1A 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
@@ -38,19 +57,21 @@ export function About() {
               }}
             >
               Where Heritage <br />
-              <span className="italic">
-                Meets Couture
-              </span>
+              <span className="italic">Meets Couture</span>
             </h2>
             <div
               className="w-20 h-0.5 mb-8"
               style={{ background: 'linear-gradient(to right, hsl(45 70% 55%), transparent)' }}
             />
             <p className="leading-relaxed text-lg mb-6 font-light" style={{ color: '#5a3a28' }}>
-              Born from a love of India's rich textile legacy, Prinsora was founded with a singular purpose — to bring the soul of traditional Indian weaving into the modern wardrobe, without compromise.
+              Born from a love of India&apos;s rich textile legacy, Prinsora was founded with a
+              singular purpose — to bring the soul of traditional Indian weaving into the modern
+              wardrobe, without compromise.
             </p>
             <p className="leading-relaxed font-light" style={{ color: '#6b4a35' }}>
-              Each silhouette in our collection is a conversation between centuries of craftsmanship and contemporary design sensibility. We believe luxury isn't a price point — it's the feeling of wearing something made entirely for you.
+              Each silhouette in our collection is a conversation between centuries of craftsmanship
+              and contemporary design sensibility. We believe luxury isn&apos;t a price point —
+              it&apos;s the feeling of wearing something made entirely for you.
             </p>
           </motion.div>
 

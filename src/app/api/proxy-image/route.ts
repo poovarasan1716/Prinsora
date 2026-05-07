@@ -11,9 +11,9 @@ export async function GET(req: NextRequest) {
   try {
     // Construct the direct download URL
     const driveUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
-    
+
     const response = await fetch(driveUrl);
-    
+
     if (!response.ok) {
       throw new Error(`Failed to fetch from Google Drive: ${response.statusText}`);
     }

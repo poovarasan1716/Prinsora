@@ -30,7 +30,8 @@ export const products: Product[] = [
     category: 'Saree',
     tag: 'Limited Edition',
     image: luxurySaree,
-    description: 'A masterpiece of textile art, this golden silk saree features hand-crafted embroidery and a shimmer that defines luxury. Perfect for the most prestigious events.',
+    description:
+      'A masterpiece of textile art, this golden silk saree features hand-crafted embroidery and a shimmer that defines luxury. Perfect for the most prestigious events.',
     sizes: ['M', 'L', 'XL'],
   },
   {
@@ -40,9 +41,10 @@ export const products: Product[] = [
     rating: 4.9,
     reviews: 156,
     category: 'Saree',
-    tag: 'Bestseller',
+    tag: '50% OFF',
     image: prod1,
-    description: 'Hand-woven Banarasi silk in deep crimson, adorned with 24k gold zari floral motifs. A masterpiece of traditional Indian craftsmanship.',
+    description:
+      'Hand-woven Banarasi silk in deep crimson, adorned with 24k gold zari floral motifs. A masterpiece of traditional Indian craftsmanship.',
     sizes: ['Free Size'],
   },
   {
@@ -54,7 +56,8 @@ export const products: Product[] = [
     category: 'Lehenga',
     tag: 'New',
     image: prod2,
-    description: 'Breathtaking forest green velvet lehenga featuring intricate peacock embroidery and hand-stitched sequins. Includes a sheer gold-bordered dupatta.',
+    description:
+      'Breathtaking forest green velvet lehenga featuring intricate peacock embroidery and hand-stitched sequins. Includes a sheer gold-bordered dupatta.',
     sizes: ['S', 'M', 'L', 'XL'],
   },
   {
@@ -64,9 +67,10 @@ export const products: Product[] = [
     rating: 4.8,
     reviews: 89,
     category: 'Gown',
-    tag: 'Luxury',
+    tag: '30% OFF',
     image: prod3,
-    description: 'A contemporary floor-length gown in midnight navy silk-satin, featuring a hand-embroidered bodice and a dramatic pleated skirt.',
+    description:
+      'A contemporary floor-length gown in midnight navy silk-satin, featuring a hand-embroidered bodice and a dramatic pleated skirt.',
     sizes: ['XS', 'S', 'M', 'L'],
   },
   {
@@ -76,9 +80,10 @@ export const products: Product[] = [
     rating: 4.7,
     reviews: 203,
     category: 'Saree',
-    tag: 'Sale',
+    tag: 'LIMITED OFFER',
     image: luxurySaree,
-    description: 'A timeless heritage saree woven with pure Kanjivaram silk, embodying centuries of Indian craft. Its rich texture and vibrant palette speak of royalty.',
+    description:
+      'A timeless heritage saree woven with pure Kanjivaram silk, embodying centuries of Indian craft. Its rich texture and vibrant palette speak of royalty.',
     sizes: ['Free Size'],
   },
   {
@@ -90,7 +95,8 @@ export const products: Product[] = [
     category: 'Saree',
     tag: 'Collection',
     image: col1,
-    description: 'Inspired by the hues of the Thar desert, this sand-colored silk saree features delicate rose-gold embroidery and a subtle shimmer.',
+    description:
+      'Inspired by the hues of the Thar desert, this sand-colored silk saree features delicate rose-gold embroidery and a subtle shimmer.',
     sizes: ['Free Size'],
   },
   {
@@ -102,7 +108,8 @@ export const products: Product[] = [
     category: 'Lehenga',
     tag: 'Designer',
     image: col2,
-    description: 'A refreshing aqua-blue lehenga with silver thread work and mirror accents. Perfect for summer weddings and seaside celebrations.',
+    description:
+      'A refreshing aqua-blue lehenga with silver thread work and mirror accents. Perfect for summer weddings and seaside celebrations.',
     sizes: ['S', 'M', 'L'],
   },
   {
@@ -114,7 +121,8 @@ export const products: Product[] = [
     category: 'Gown',
     tag: 'Limited',
     image: col3,
-    description: 'A black velvet gown with hand-painted floral motifs and a structured trail. Designed for those who want to make a statement.',
+    description:
+      'A black velvet gown with hand-painted floral motifs and a structured trail. Designed for those who want to make a statement.',
     sizes: ['XS', 'S', 'M'],
   },
   {
@@ -124,9 +132,10 @@ export const products: Product[] = [
     rating: 4.9,
     reviews: 128,
     category: 'Saree',
-    tag: 'Festive',
+    tag: '20% OFF',
     image: prod1, // Reusing prod1 for a variant
-    description: 'A variant of our signature crimson saree, this piece features heavier gold work on the borders, specifically for festive occasions.',
+    description:
+      'A variant of our signature crimson saree, this piece features heavier gold work on the borders, specifically for festive occasions.',
     sizes: ['Free Size'],
   },
   {
@@ -138,7 +147,8 @@ export const products: Product[] = [
     category: 'Lehenga',
     tag: 'Bridal',
     image: prod2, // Reusing prod2 for a variant
-    description: 'The ultimate bridal lehenga in forest green, featuring 3D floral embroidery and thousands of hand-placed crystals.',
+    description:
+      'The ultimate bridal lehenga in forest green, featuring 3D floral embroidery and thousands of hand-placed crystals.',
     sizes: ['Custom'],
   },
   {
@@ -149,12 +159,12 @@ export const products: Product[] = [
     reviews: 56,
     category: 'Gown',
     image: prod3, // Reusing prod3 for a variant
-    description: 'A celestial-themed navy gown with sparkling silver constellations embroidered across the skirt. Truly a work of art.',
+    description:
+      'A celestial-themed navy gown with sparkling silver constellations embroidered across the skirt. Truly a work of art.',
     sizes: ['XS', 'S', 'M', 'L'],
   },
 ];
 
-export const formatPrice = (price: number): string =>
-  '₹' + price.toLocaleString('en-IN');
+export const formatPrice = (price: number): string => '₹' + price.toLocaleString('en-IN');
 
-export const categories = ['All', 'Saree', 'Lehenga', 'Gown', 'Kurta'] as const;
+export const categories = ['All', 'Saree', 'Lehenga', 'Gown', 'Kurta', 'Jewelry'] as const;

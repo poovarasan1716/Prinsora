@@ -14,11 +14,13 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     try {
       const stored = localStorage.getItem('prinsora_wishlist');
       return stored ? JSON.parse(stored) : [];
-    } catch { return []; }
+    } catch {
+      return [];
+    }
   });
 
   const toggle = (id: string) => {
-    const next = items.includes(id) ? items.filter(i => i !== id) : [...items, id];
+    const next = items.includes(id) ? items.filter((i) => i !== id) : [...items, id];
     setItems(next);
     localStorage.setItem('prinsora_wishlist', JSON.stringify(next));
   };

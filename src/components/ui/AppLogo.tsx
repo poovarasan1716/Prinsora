@@ -8,7 +8,10 @@ interface AppLogoProps {
 
 export default function AppLogo({ size = 40, className = '' }: AppLogoProps) {
   return (
-    <div className={`relative flex items-center justify-center ${className}`} style={{ width: size, height: size }}>
+    <div
+      className={`relative flex items-center justify-center ${className}`}
+      style={{ width: size, height: size }}
+    >
       <svg
         viewBox="0 0 24 24"
         fill="none"
@@ -20,7 +23,14 @@ export default function AppLogo({ size = 40, className = '' }: AppLogoProps) {
           fill="url(#gold-gradient)"
         />
         <defs>
-          <linearGradient id="gold-gradient" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+          <linearGradient
+            id="gold-gradient"
+            x1="2"
+            y1="2"
+            x2="22"
+            y2="22"
+            gradientUnits="userSpaceOnUse"
+          >
             <stop stopColor="#D4AF37" />
             <stop offset="0.5" stopColor="#F4EBD9" />
             <stop offset="1" stopColor="#C5A028" />

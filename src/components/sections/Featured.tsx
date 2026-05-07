@@ -9,7 +9,8 @@ import { useWishlist } from '@/context/WishlistContext';
 import { useToast } from '@/hooks/use-toast';
 import AppImage from '@/components/ui/AppImage';
 
-const GOLD = 'linear-gradient(135deg, #8B5E1A 0%, #D4A843 28%, #F5D47A 50%, #C8881E 72%, #8B5E1A 100%)';
+const GOLD =
+  'linear-gradient(135deg, #8B5E1A 0%, #D4A843 28%, #F5D47A 50%, #C8881E 72%, #8B5E1A 100%)';
 const BTN_GOLD = 'linear-gradient(135deg, hsl(38 70% 42%) 0%, hsl(45 80% 55%) 100%)';
 
 export function Featured() {
@@ -24,17 +25,17 @@ export function Featured() {
 
   useEffect(() => {
     fetch('/api/products')
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         if (data.products) setProducts(data.products.slice(0, 3));
       })
-      .catch(err => console.error('Failed to fetch featured products:', err))
+      .catch((err) => console.error('Failed to fetch featured products:', err))
       .finally(() => setIsLoading(false));
   }, []);
 
   const featured = products;
 
-  const handleAddToCart = (e: React.MouseEvent, product: typeof products[0]) => {
+  const handleAddToCart = (e: React.MouseEvent, product: (typeof products)[0]) => {
     e.preventDefault();
     e.stopPropagation();
     if (!user) {
@@ -51,7 +52,10 @@ export function Featured() {
     e.preventDefault();
     e.stopPropagation();
     toggle(id);
-    toast({ title: isLiked(id) ? 'Removed from Wishlist' : '♡ Saved to Wishlist', description: '' });
+    toast({
+      title: isLiked(id) ? 'Removed from Wishlist' : '♡ Saved to Wishlist',
+      description: '',
+    });
   };
 
   return (
@@ -73,7 +77,10 @@ export function Featured() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <p className="text-xs tracking-[0.3em] uppercase mb-3 font-medium" style={{ color: 'hsl(38 80% 45%)' }}>
+          <p
+            className="text-xs tracking-[0.3em] uppercase mb-3 font-medium"
+            style={{ color: 'hsl(38 80% 45%)' }}
+          >
             Handpicked for You
           </p>
           <h2
@@ -88,7 +95,12 @@ export function Featured() {
           >
             Curated Excellence
           </h2>
-          <div className="w-24 h-0.5 mx-auto mt-6 rounded-full" style={{ background: 'linear-gradient(to right, transparent, hsl(45 70% 55%), transparent)' }} />
+          <div
+            className="w-24 h-0.5 mx-auto mt-6 rounded-full"
+            style={{
+              background: 'linear-gradient(to right, transparent, hsl(45 70% 55%), transparent)',
+            }}
+          />
         </motion.div>
 
         {isLoading ? (
@@ -130,7 +142,10 @@ export function Featured() {
 
                   {/* Tag */}
                   {product.tag && (
-                    <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-bold" style={{ background: BTN_GOLD, color: '#1a0f08' }}>
+                    <span
+                      className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-bold"
+                      style={{ background: BTN_GOLD, color: '#1a0f08' }}
+                    >
                       {product.tag}
                     </span>
                   )}
@@ -140,21 +155,31 @@ export function Featured() {
                     className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1"
                     style={{ background: 'rgba(255,255,255,0.92)', color: '#1a0f08' }}
                   >
-                    <Star className="w-3 h-3" style={{ fill: 'hsl(38 80% 50%)', color: 'hsl(38 80% 50%)' }} />
+                    <Star
+                      className="w-3 h-3"
+                      style={{ fill: 'hsl(38 80% 50%)', color: 'hsl(38 80% 50%)' }}
+                    />
                     {product.rating}
                   </div>
 
                   {/* Wishlist */}
                   <motion.button
-                    onClick={e => handleWishlist(e, product.id)}
+                    onClick={(e) => handleWishlist(e, product.id)}
                     className="absolute bottom-3 right-3 w-8 h-8 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                    style={{ background: 'rgba(15,8,5,0.8)', border: '1px solid hsl(45 70% 55% / 0.4)' }}
+                    style={{
+                      background: 'rgba(15,8,5,0.8)',
+                      border: '1px solid hsl(45 70% 55% / 0.4)',
+                    }}
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                   >
                     <Heart
                       className="w-3.5 h-3.5"
-                      style={isLiked(product.id) ? { fill: 'hsl(45 70% 55%)', color: 'hsl(45 70% 55%)' } : { color: 'hsl(45 70% 55%)' }}
+                      style={
+                        isLiked(product.id)
+                          ? { fill: 'hsl(45 70% 55%)', color: 'hsl(45 70% 55%)' }
+                          : { color: 'hsl(45 70% 55%)' }
+                      }
                     />
                   </motion.button>
                 </div>
@@ -166,12 +191,26 @@ export function Featured() {
                   >
                     {product.name}
                   </h3>
-                  <p className="text-xs mb-3" style={{ color: 'hsl(38 50% 50%)' }}>{product.category}</p>
-                  <div className="w-10 h-0.5 mb-4 rounded" style={{ background: 'hsl(45 70% 55% / 0.5)' }} />
+                  <p className="text-xs mb-3" style={{ color: 'hsl(38 50% 50%)' }}>
+                    {product.category}
+                  </p>
+                  <div
+                    className="w-10 h-0.5 mb-4 rounded"
+                    style={{ background: 'hsl(45 70% 55% / 0.5)' }}
+                  />
                   <div className="flex items-center justify-between">
-                    <span className="text-lg font-medium" style={{ color: 'hsl(38 60% 40%)' }}>{formatPrice(product.price)}</span>
+                    <div className="flex flex-col">
+                      {product.originalPrice && product.originalPrice > product.price && (
+                        <span className="text-[10px] line-through opacity-50" style={{ color: 'hsl(38 60% 40%)' }}>
+                          {formatPrice(product.originalPrice)}
+                        </span>
+                      )}
+                      <span className="text-lg font-medium" style={{ color: 'hsl(38 60% 40%)' }}>
+                        {formatPrice(product.price)}
+                      </span>
+                    </div>
                     <motion.button
-                      onClick={e => handleAddToCart(e, product)}
+                      onClick={(e) => handleAddToCart(e, product)}
                       className="p-2.5 rounded-full transition-all duration-200"
                       style={{ background: 'hsl(45 70% 55%)', color: '#fff' }}
                       whileHover={{ scale: 1.1 }}

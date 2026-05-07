@@ -1,9 +1,22 @@
 'use client';
 
 import React from 'react';
-import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
-  LineChart, Line, PieChart, Pie, Cell, Legend, AreaChart, Area 
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+  AreaChart,
+  Area,
 } from 'recharts';
 import { TrendingUp, Users, DollarSign, ShoppingBag, ExternalLink } from 'lucide-react';
 import { formatPrice } from '@/data/products';
@@ -17,7 +30,6 @@ interface AnalyticsProps {
 const COLORS = ['#D4A843', '#8B5E1A', '#C8881E', '#F5D47A', '#000000'];
 
 export default function AnalyticsDashboard({ orders, users, products }: AnalyticsProps) {
-  
   // Calculate Totals
   const totalRevenue = orders.reduce((acc, order) => acc + (order.total || 0), 0);
   const totalOrders = orders.length;
@@ -25,19 +37,21 @@ export default function AnalyticsDashboard({ orders, users, products }: Analytic
   const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
   // Prepare Sales Data for Line Chart (Revenue over time)
-  const salesData = orders.map(o => ({
-    date: new Date(o.date).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }),
-    amount: o.total
-  })).reverse();
+  const salesData = orders
+    .map((o) => ({
+      date: new Date(o.date).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }),
+      amount: o.total,
+    }))
+    .reverse();
 
   // Prepare Category Data for Pie Chart
   const categoryCount: Record<string, number> = {};
-  orders.forEach(order => {
+  orders.forEach((order) => {
     order.items.forEach((item: any) => {
       // Find category from products list
-      const product = products.find(p => p.name === item.name);
+      const product = products.find((p) => p.name === item.name);
       const cat = product?.category || 'Other';
-      categoryCount[cat] = (categoryCount[cat] || 0) + (item.price * item.quantity);
+      categoryCount[cat] = (categoryCount[cat] || 0) + item.price * item.quantity;
     });
   });
 
@@ -48,12 +62,25 @@ export default function AnalyticsDashboard({ orders, users, products }: Analytic
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { label: 'Total Revenue', value: formatPrice(totalRevenue), icon: DollarSign, color: 'text-accent' },
+          {
+            label: 'Total Revenue',
+            value: formatPrice(totalRevenue),
+            icon: DollarSign,
+            color: 'text-accent',
+          },
           { label: 'Total Orders', value: totalOrders, icon: ShoppingBag, color: 'text-blue-400' },
           { label: 'Total Customers', value: totalUsers, icon: Users, color: 'text-green-400' },
-          { label: 'Avg Order Value', value: formatPrice(avgOrderValue), icon: TrendingUp, color: 'text-purple-400' },
+          {
+            label: 'Avg Order Value',
+            value: formatPrice(avgOrderValue),
+            icon: TrendingUp,
+            color: 'text-purple-400',
+          },
         ].map((stat, i) => (
-          <div key={i} className="bg-zinc-900/50 border border-white/10 p-6 rounded-2xl backdrop-blur-sm">
+          <div
+            key={i}
+            className="bg-zinc-900/50 border border-white/10 p-6 rounded-2xl backdrop-blur-sm"
+          >
             <div className="flex justify-between items-start mb-4">
               <div className={`p-2 rounded-lg bg-white/5 ${stat.color}`}>
                 <stat.icon className="w-5 h-5" />
@@ -74,18 +101,41 @@ export default function AnalyticsDashboard({ orders, users, products }: Analytic
               <AreaChart data={salesData}>
                 <defs>
                   <linearGradient id="colorAmt" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#D4A843" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#D4A843" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#D4A843" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#D4A843" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
-                <XAxis dataKey="date" stroke="#666" fontSize={10} tickLine={false} axisLine={false} />
-                <YAxis stroke="#666" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(v) => `₹${v/1000}k`} />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#18181b', border: '1px solid #333', borderRadius: '8px' }}
+                <XAxis
+                  dataKey="date"
+                  stroke="#666"
+                  fontSize={10}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis
+                  stroke="#666"
+                  fontSize={10}
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(v) => `₹${v / 1000}k`}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#18181b',
+                    border: '1px solid #333',
+                    borderRadius: '8px',
+                  }}
                   itemStyle={{ color: '#D4A843' }}
                 />
-                <Area type="monotone" dataKey="amount" stroke="#D4A843" fillOpacity={1} fill="url(#colorAmt)" strokeWidth={2} />
+                <Area
+                  type="monotone"
+                  dataKey="amount"
+                  stroke="#D4A843"
+                  fillOpacity={1}
+                  fill="url(#colorAmt)"
+                  strokeWidth={2}
+                />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -110,8 +160,12 @@ export default function AnalyticsDashboard({ orders, users, products }: Analytic
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#18181b', border: '1px solid #333', borderRadius: '8px' }}
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#18181b',
+                    border: '1px solid #333',
+                    borderRadius: '8px',
+                  }}
                   itemStyle={{ color: '#D4A843' }}
                 />
                 <Legend iconType="circle" />
@@ -126,10 +180,11 @@ export default function AnalyticsDashboard({ orders, users, products }: Analytic
         <div>
           <h3 className="text-xl font-serif font-bold text-white mb-2">Live Traffic Analytics</h3>
           <p className="text-zinc-400 text-sm max-w-xl">
-            For deep insights into user behavior, acquisition channels, and real-time active users, view your full dashboard in Google Analytics 4.
+            For deep insights into user behavior, acquisition channels, and real-time active users,
+            view your full dashboard in Google Analytics 4.
           </p>
         </div>
-        <button 
+        <button
           onClick={() => window.open('https://analytics.google.com/', '_blank')}
           className="flex items-center gap-2 px-6 py-3 rounded-full bg-white/10 text-white font-bold hover:bg-white/20 transition-all border border-white/10"
         >

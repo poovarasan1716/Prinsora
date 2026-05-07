@@ -6,7 +6,10 @@ export async function POST(req: NextRequest) {
     const scriptUrl = process.env.GOOGLE_APPS_SCRIPT_URL;
 
     if (!scriptUrl) {
-      return NextResponse.json({ success: false, error: 'GOOGLE_APPS_SCRIPT_URL not set' }, { status: 500 });
+      return NextResponse.json(
+        { success: false, error: 'GOOGLE_APPS_SCRIPT_URL not set' },
+        { status: 500 }
+      );
     }
 
     const response = await fetch(scriptUrl, {
@@ -16,19 +19,12 @@ export async function POST(req: NextRequest) {
         action: 'placeOrder', // Using the known working action for appending rows
         sheetId: process.env.GOOGLE_SHEET_ID,
         sheetName: process.env.GOOGLE_SHEET_USERS_NAME || 'User_details',
-        orderRows: [[
-          new Date().toLocaleString(),
-          name,
-          email,
-          phone || 'N/A',
-          'Active'
-        ]]
+        orderRows: [[new Date().toLocaleString(), name, email, phone || 'N/A', 'Active']],
       }),
     });
 
     const result = await response.json();
     return NextResponse.json(result);
-
   } catch (error: any) {
     console.error('Sync User Error:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

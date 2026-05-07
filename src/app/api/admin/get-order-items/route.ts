@@ -14,7 +14,7 @@ export async function GET() {
       body: JSON.stringify({
         action: 'getSheetData',
         sheetId: process.env.GOOGLE_SHEET_ID,
-        sheetName: process.env.GOOGLE_SHEET_ORDER_ITEMS_NAME || 'Order_Items'
+        sheetName: process.env.GOOGLE_SHEET_ORDER_ITEMS_NAME || 'Order_Items',
       }),
     });
 
@@ -32,11 +32,10 @@ export async function GET() {
       size: row[3],
       quantity: row[4],
       price: row[5],
-      total: row[6]
+      total: row[6],
     }));
 
     return NextResponse.json({ success: true, items });
-
   } catch (error: any) {
     console.error('Fetch Order Items Error:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

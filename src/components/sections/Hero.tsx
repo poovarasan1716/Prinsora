@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import { Store, Users, Star, Package } from 'lucide-react';
 import AppImage from '@/components/ui/AppImage';
 import fallbackImage from '@/assets/images/product-1.png';
 
@@ -23,7 +24,7 @@ function ModelViewer({ onError }: { onError: () => void }) {
     if (!mount) return;
 
     let animId: number;
-    let cleanupFns: (() => void)[] = [];
+    const cleanupFns: (() => void)[] = [];
 
     (async () => {
       try {
@@ -35,7 +36,6 @@ function ModelViewer({ onError }: { onError: () => void }) {
         const W = mount.clientWidth || 500;
         const H = mount.clientHeight || 600;
 
-        // Check WebGL support first
         const testCanvas = document.createElement('canvas');
         const ctx = testCanvas.getContext('webgl2') || testCanvas.getContext('webgl');
         if (!ctx) { onError(); return; }
@@ -55,7 +55,6 @@ function ModelViewer({ onError }: { onError: () => void }) {
         const camera = new THREE.PerspectiveCamera(38, W / H, 0.1, 100);
         camera.position.set(0, 0.4, 7.5);
 
-        // Lighting — bright gold sculptural look
         scene.add(new THREE.AmbientLight(0xffd080, 2.5));
 
         const keyLight = new THREE.DirectionalLight(0xfff0a0, 10);
@@ -79,7 +78,6 @@ function ModelViewer({ onError }: { onError: () => void }) {
         frontLight.position.set(0, 1, 5);
         scene.add(frontLight);
 
-        // Gold dark metallic material — brighter
         const goldMat = new THREE.MeshStandardMaterial({
           color: new THREE.Color(0x2a1500),
           metalness: 1.0,
@@ -87,14 +85,12 @@ function ModelViewer({ onError }: { onError: () => void }) {
           envMapIntensity: 4.5,
         });
 
-        // Environment
         const pmrem = new THREE.PMREMGenerator(renderer);
         pmrem.compileEquirectangularShader();
         const envTexture = pmrem.fromScene(new RoomEnvironment()).texture;
         scene.environment = envTexture;
         pmrem.dispose();
 
-        // Load GLB
         const loader = new GLTFLoader();
         let mixer: THREE.AnimationMixer | null = null;
         loader.load(
@@ -112,11 +108,13 @@ function ModelViewer({ onError }: { onError: () => void }) {
             const center = box.getCenter(new THREE.Vector3());
             const size = box.getSize(new THREE.Vector3());
             const maxDim = Math.max(size.x, size.y, size.z);
+            
+            // BOLD MODEL SIZE FOR PREMIUM IMPACT
             const scale = 3.0 / maxDim;
             model.scale.setScalar(scale);
             model.position.copy(center.multiplyScalar(-scale));
-            model.position.y -= 0.2;
             scene.add(model);
+            
             if (gltf.animations.length > 0) {
               mixer = new THREE.AnimationMixer(model);
               gltf.animations.forEach((clip) => mixer!.clipAction(clip).play());
@@ -124,7 +122,6 @@ function ModelViewer({ onError }: { onError: () => void }) {
           },
           undefined,
           () => {
-            // Fallback: two spheres if GLB fails
             const geo = new THREE.SphereGeometry(0.7, 64, 64);
             const s1 = new THREE.Mesh(geo, goldMat);
             s1.position.set(-0.6, 0.3, 0);
@@ -186,7 +183,6 @@ function HeroVisual() {
   return (
     <div className="relative w-full h-full">
       {webglFailed ? (
-        // Fallback: reference image with matching visual effects
         <div className="relative w-full h-full flex items-center justify-center">
           <div className="relative w-full max-w-[540px] h-full overflow-hidden">
             <AppImage
@@ -215,7 +211,6 @@ export function Hero() {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_75%_75%_at_65%_50%,hsl(20_42%_11%),hsl(20_45%_5%))] pointer-events-none" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_40%_50%_at_70%_55%,hsl(38_65%_38%_/_0.06),transparent)] pointer-events-none" />
 
-      {/* Gold dust particles — right half */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {particles.map((p) => (
           <div
@@ -332,17 +327,17 @@ export function Hero() {
                 data-testid="stats-bar"
               >
                 {[
-                  { icon: '🛍', value: '2,000+', label: 'STYLES AVAILABLE' },
-                  { icon: '👥', value: '50,000+', label: 'HAPPY CUSTOMERS' },
-                  { icon: '⭐', value: '4.9★', label: 'AVERAGE RATING' },
-                  { icon: '📦', value: 'Free', label: 'SHIPPING ₹999+' },
+                  { icon: Store, value: '2,000+', label: 'STYLES AVAILABLE', color: 'hsl(45 70% 55%)' },
+                  { icon: Users, value: '50,000+', label: 'HAPPY CUSTOMERS', color: 'hsl(260 40% 60%)' },
+                  { icon: Star, value: '4.9★', label: 'AVERAGE RATING', color: 'hsl(45 95% 55%)' },
+                  { icon: Package, value: 'Free', label: 'SHIPPING ₹999+', color: 'hsl(25 60% 55%)' },
                 ].map((s, i) => (
                   <div
                     key={s.label}
                     className="flex items-center gap-2 px-4 py-3 flex-1 min-w-[110px]"
                     style={{ borderColor: 'hsl(38 40% 25% / 0.4)' }}
                   >
-                    <span className="text-base leading-none">{s.icon}</span>
+                    <s.icon className="w-5 h-5" style={{ color: s.color }} />
                     <div className="flex flex-col">
                       <span className="font-serif font-semibold text-foreground text-sm leading-tight">{s.value}</span>
                       <span className="text-[9px] tracking-widest text-muted-foreground uppercase">{s.label}</span>
@@ -360,7 +355,6 @@ export function Hero() {
             animate={{ opacity: 1 }}
             transition={{ duration: 1.4, delay: 0.15 }}
           >
-            {/* Orbital rings — SVG */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
               <svg
                 className="absolute w-full h-full"
@@ -369,15 +363,13 @@ export function Hero() {
                 xmlns="http://www.w3.org/2000/svg"
                 style={{ overflow: 'visible' }}
               >
-                {/* Main sweeping arc */}
                 <ellipse
-                  cx="250" cy="270" rx="230" ry="90"
+                  cx="250" cy="250" rx="230" ry="90"
                   stroke="url(#gr1)"
                   strokeWidth="1.8"
                   strokeDasharray="700 300"
                   style={{ animation: 'orbitDash 7s linear infinite' }}
                 />
-                {/* Secondary arc */}
                 <ellipse
                   cx="250" cy="250" rx="210" ry="75"
                   stroke="url(#gr2)"
@@ -385,7 +377,6 @@ export function Hero() {
                   strokeDasharray="400 500"
                   style={{ animation: 'orbitDash 11s linear infinite reverse' }}
                 />
-                {/* Diagonal ring */}
                 <ellipse
                   cx="250" cy="250" rx="75" ry="230"
                   stroke="url(#gr3)"
@@ -415,7 +406,6 @@ export function Hero() {
               </svg>
             </div>
 
-            {/* Radial glow behind model */}
             <div
               className="absolute pointer-events-none z-0"
               style={{
@@ -425,12 +415,10 @@ export function Hero() {
               }}
             />
 
-            {/* 3D canvas / fallback image */}
             <div className="relative z-10 w-full h-full">
               <HeroVisual />
             </div>
 
-            {/* Sparkle accents */}
             <div
               className="absolute bottom-10 right-6 text-3xl pointer-events-none select-none z-30"
               style={{
@@ -438,16 +426,6 @@ export function Hero() {
                 opacity: 0.65,
                 textShadow: '0 0 18px hsl(45 70% 55%)',
                 animation: 'sparkPulse 2.8s ease-in-out infinite',
-              }}
-            >
-              ✦
-            </div>
-            <div
-              className="absolute top-16 right-16 text-lg pointer-events-none select-none z-30"
-              style={{
-                color: 'hsl(45 70% 55%)',
-                opacity: 0.35,
-                animation: 'sparkPulse 3.5s ease-in-out infinite 1s',
               }}
             >
               ✦

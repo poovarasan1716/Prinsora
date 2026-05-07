@@ -25,18 +25,23 @@ export function Footer() {
               <span className="font-serif text-2xl font-semibold text-primary">Prinsora</span>
             </div>
             <p className="text-muted-foreground font-light leading-relaxed text-sm mb-6">
-              Luxury Indian fashion where every thread carries grace and every silhouette tells your story.
+              Luxury Indian fashion where every thread carries grace and every silhouette tells your
+              story.
             </p>
-            <div className="flex items-center gap-4">
-            </div>
+            <div className="flex items-center gap-4"></div>
           </div>
 
           <div>
-            <h4 className="font-serif text-foreground font-medium mb-5 tracking-wide">Quick Links</h4>
+            <h4 className="font-serif text-foreground font-medium mb-5 tracking-wide">
+              Quick Links
+            </h4>
             <ul className="space-y-3">
               {links.quick.map((item) => (
                 <li key={item.label}>
-                  <Link href={item.href} className="text-sm text-muted-foreground hover:text-primary transition-colors font-light flex items-center gap-2 group">
+                  <Link
+                    href={item.href}
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors font-light flex items-center gap-2 group"
+                  >
                     <span className="w-4 h-px bg-primary/0 group-hover:bg-primary/60 transition-all duration-200" />
                     {item.label}
                   </Link>
@@ -46,11 +51,16 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-serif text-foreground font-medium mb-5 tracking-wide">Customer Care</h4>
+            <h4 className="font-serif text-foreground font-medium mb-5 tracking-wide">
+              Customer Care
+            </h4>
             <ul className="space-y-3">
               {links.support.map((item) => (
                 <li key={item}>
-                  <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors font-light flex items-center gap-2 group">
+                  <a
+                    href="#"
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors font-light flex items-center gap-2 group"
+                  >
                     <span className="w-4 h-px bg-primary/0 group-hover:bg-primary/60 transition-all duration-200" />
                     {item}
                   </a>
@@ -60,7 +70,9 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-serif text-foreground font-medium mb-5 tracking-wide">Get in Touch</h4>
+            <h4 className="font-serif text-foreground font-medium mb-5 tracking-wide">
+              Get in Touch
+            </h4>
             <ul className="space-y-4">
               <li className="flex items-start gap-3 text-sm text-muted-foreground font-light">
                 <Mail className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
@@ -77,7 +89,9 @@ export function Footer() {
             </ul>
 
             <div className="mt-8">
-              <p className="text-xs text-muted-foreground mb-3 tracking-wide uppercase">Newsletter</p>
+              <p className="text-xs text-muted-foreground mb-3 tracking-wide uppercase">
+                Newsletter
+              </p>
               <div className="flex gap-0">
                 <input
                   data-testid="input-newsletter"
@@ -102,11 +116,20 @@ export function Footer() {
           <p className="text-xs text-muted-foreground">
             &copy; {new Date().getFullYear()} Prinsora. All rights reserved. Crafted with grace.
           </p>
-          <div className="flex items-center gap-6">
-            {['Privacy Policy', 'Terms of Service', 'Shipping Policy'].map((item) => (
-              <a key={item} href="#" className="text-xs text-muted-foreground hover:text-primary transition-colors">
-                {item}
-              </a>
+          <div className="flex flex-wrap items-center justify-center md:justify-end gap-x-6 gap-y-2">
+            {[
+              { label: 'Privacy Policy', href: '/privacy-policy' },
+              { label: 'Terms & Conditions', href: '/terms-and-conditions' },
+              { label: 'Shipping Policy', href: '/shipping-policy' },
+              { label: 'Refund Policy', href: '/refund-policy' },
+            ].map((item) => (
+              <Link
+                key={item.label}
+                href={item.href}
+                className="text-[10px] uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors"
+              >
+                {item.label}
+              </Link>
             ))}
           </div>
         </div>

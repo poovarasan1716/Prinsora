@@ -26,16 +26,19 @@ function Model({ url, size }: { url: string; size: number }) {
 
 export default function Logo3DViewer({ size = 42 }: { size?: number }) {
   return (
-    <div style={{ width: size, height: size }} className="relative flex items-center justify-center">
-      <Canvas 
-        camera={{ position: [0, 0, 5], fov: 35 }} 
+    <div
+      style={{ width: size, height: size }}
+      className="relative flex items-center justify-center"
+    >
+      <Canvas
+        camera={{ position: [0, 0, 5], fov: 35 }}
         style={{ width: '100%', height: '100%' }}
         gl={{ alpha: true, antialias: true }}
         dpr={[1, 2]}
       >
         <ambientLight intensity={1.5} />
         <pointLight position={[5, 5, 5]} intensity={2} color="#D4AF37" />
-        
+
         <Suspense fallback={null}>
           <Model url="/prinsora_logo.glb" size={size} />
           <Environment preset="city" />
