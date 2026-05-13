@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft,
   Heart,
@@ -12,7 +12,10 @@ import {
   Truck,
   RefreshCw,
   Loader2,
+  Camera,
+  X,
 } from 'lucide-react';
+
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { formatPrice } from '@/data/products';
@@ -41,6 +44,13 @@ export default function ProductDetailPage() {
   const [selectedSize, setSelectedSize] = useState('M');
   const [addingToCart, setAddingToCart] = useState(false);
 
+  // Review states
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [newReview, setNewReview] = useState({ rating: 5, comment: '', image: '' as any });
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+
+
   useEffect(() => {
     if (!id) return;
 
@@ -60,7 +70,20 @@ export default function ProductDetailPage() {
       })
       .catch((err) => console.error('Failed to fetch product details:', err))
       .finally(() => setIsLoading(false));
+
+    fetchReviews();
   }, [id]);
+
+  const fetchReviews = async () => {
+    try {
+      const res = await fetch(`/api/reviews?productId=${id}`);
+      const data = await res.json();
+      if (data.success) setReviews(data.reviews);
+    } catch (err) {
+      console.error('Failed to fetch reviews');
+    }
+  };
+
 
   if (isLoading) {
     return (
@@ -122,6 +145,61 @@ export default function ProductDetailPage() {
     addItem(product, selectedSize);
     router.push('/cart');
   };
+
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) {
+      toast({ title: 'Login Required', description: 'Please login to write a review' });
+      return;
+    }
+    
+    setIsSubmittingReview(true);
+    try {
+      let imageData = '';
+      let fileName = '';
+      if (newReview.image) {
+        imageData = newReview.image.split(',')[1];
+        fileName = `review_${user.id}_${Date.now()}.png`;
+      }
+
+      const res = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productId: id,
+          userName: user.name,
+          rating: newReview.rating,
+          comment: newReview.comment,
+          imageData,
+          fileName,
+          mimeType: 'image/png'
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        toast({ title: '✦ Review Submitted', description: 'Your review is pending moderation.' });
+        setShowReviewForm(false);
+        setNewReview({ rating: 5, comment: '', image: '' });
+      }
+    } catch (err) {
+      toast({ title: 'Error', description: 'Failed to submit review', variant: 'destructive' });
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewReview({ ...newReview, image: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
 
   const liked = isLiked(product.id);
 
@@ -340,8 +418,144 @@ export default function ProductDetailPage() {
               </div>
             </motion.div>
           </div>
+
+          {/* Reviews Section */}
+          <div className="mt-24 pt-16 border-t border-white/5">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+              <div>
+                <h2 className="text-3xl font-serif text-white mb-2">Customer Experiences</h2>
+                <p className="text-zinc-500 text-sm italic">Sharing the elegance of Prinsora from across the world.</p>
+              </div>
+              <button 
+                onClick={() => setShowReviewForm(!showReviewForm)}
+                className="px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest border border-accent/30 text-accent hover:bg-accent/10 transition-all"
+              >
+                {showReviewForm ? 'Cancel Review' : 'Share Your Experience'}
+              </button>
+            </div>
+
+            <AnimatePresence>
+              {showReviewForm && (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mb-16 overflow-hidden"
+                >
+                  <form 
+                    onSubmit={handleSubmitReview}
+                    className="max-w-2xl bg-zinc-900/50 border border-white/10 rounded-2xl p-8 backdrop-blur-sm"
+                  >
+                    <div className="grid gap-6">
+                      <div className="flex gap-2">
+                        {[1,2,3,4,5].map((star) => (
+                          <button 
+                            key={star}
+                            type="button"
+                            onClick={() => setNewReview({...newReview, rating: star})}
+                            className="transition-transform hover:scale-110"
+                          >
+                            <Star 
+                              className="w-6 h-6" 
+                              style={{ 
+                                fill: star <= newReview.rating ? 'hsl(45 80% 55%)' : 'transparent',
+                                color: 'hsl(45 80% 55%)'
+                              }} 
+                            />
+                          </button>
+                        ))}
+                      </div>
+                      <div>
+                        <label className="block text-[10px] uppercase tracking-widest text-zinc-500 mb-2">Your Experience</label>
+                        <textarea 
+                          required
+                          value={newReview.comment}
+                          onChange={(e) => setNewReview({...newReview, comment: e.target.value})}
+                          placeholder="Tell us about the fit, fabric, and how you felt..."
+                          className="w-full bg-zinc-950 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-accent/50 h-32 resize-none"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-[10px] uppercase tracking-widest text-zinc-500 mb-2">Share a Photo (Optional)</label>
+                        {!newReview.image ? (
+                          <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-white/10 rounded-xl cursor-pointer hover:bg-white/5 transition-colors">
+                            <Camera className="w-8 h-8 text-zinc-600 mb-2" />
+                            <span className="text-xs text-zinc-500">Click to upload or drag & drop</span>
+                            <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
+                          </label>
+                        ) : (
+                          <div className="relative w-40 h-40 rounded-xl overflow-hidden group">
+                            <img src={newReview.image} alt="Review" className="w-full h-full object-cover" />
+                            <button 
+                              type="button"
+                              onClick={() => setNewReview({...newReview, image: ''})}
+                              className="absolute top-2 right-2 p-1.5 bg-black/50 rounded-full text-white hover:bg-red-500 transition-colors"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                      <button 
+                        type="submit"
+                        disabled={isSubmittingReview}
+                        className="w-full py-4 rounded-xl bg-accent text-primary font-bold uppercase tracking-widest text-xs disabled:opacity-50 transition-transform hover:scale-[1.02]"
+                      >
+                        {isSubmittingReview ? 'Submitting Your Story...' : 'Post Review'}
+                      </button>
+                    </div>
+                  </form>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {reviews.map((rev, i) => (
+                <motion.div 
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  className="bg-zinc-900/40 border border-white/5 rounded-2xl p-6 backdrop-blur-sm"
+                >
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <p className="text-white font-serif font-medium">{rev.userName}</p>
+                      <p className="text-[10px] text-zinc-500">{rev.timestamp}</p>
+                    </div>
+                    <div className="flex gap-0.5">
+                      {Array.from({ length: 5 }).map((_, j) => (
+                        <Star 
+                          key={j}
+                          className="w-3 h-3"
+                          style={{ 
+                            fill: j < rev.rating ? 'hsl(45 80% 55%)' : 'transparent',
+                            color: 'hsl(45 80% 55%)'
+                          }} 
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-sm text-zinc-400 mb-4 line-clamp-4 leading-relaxed italic">"{rev.comment}"</p>
+                  {rev.imageUrl && (
+                    <div className="relative w-full h-48 rounded-xl overflow-hidden mt-4">
+                      <AppImage src={rev.imageUrl} alt="Review" fill className="object-cover" />
+                    </div>
+                  )}
+                </motion.div>
+              ))}
+              {reviews.length === 0 && !showReviewForm && (
+                <div className="col-span-full py-20 text-center border border-dashed border-white/10 rounded-3xl">
+                  <p className="text-zinc-500 text-sm">Be the first to share your Prinsora story.</p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
+
       <Footer />
     </div>
   );

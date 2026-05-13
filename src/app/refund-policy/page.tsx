@@ -38,8 +38,10 @@ export default function RefundPolicy() {
           <section>
             <h2 className="text-xl font-serif text-white mb-4">Process for Returns</h2>
             <p>
-              To initiate a return, please email returns@prinsora.com with your order number and
-              photos of the item. Items must be in their original packaging with tags attached.
+              To initiate a return, you can simply go to your <strong>Profile</strong> page, find the specific order in your order history, and click the <strong>Return</strong> button. You will be asked to provide a reason for the return.
+            </p>
+            <p className="mt-2">
+              Alternatively, you can email returns@prinsora.com with your order number. Items must be in their original packaging with tags attached.
             </p>
           </section>
 

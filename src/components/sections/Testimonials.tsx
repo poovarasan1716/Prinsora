@@ -1,51 +1,59 @@
+'use client';
+
 import { motion } from 'framer-motion';
 import { Star, Quote } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import AppImage from '@/components/ui/AppImage';
-import av1 from '@/assets/images/avatar-1.png';
-import av2 from '@/assets/images/avatar-2.png';
-import av3 from '@/assets/images/avatar-3.png';
-import modelAvatar from '@/assets/images/model-avatar.png';
 
 const GOLD =
   'linear-gradient(135deg, #8B5E1A 0%, #D4A843 28%, #F5D47A 50%, #C8881E 72%, #8B5E1A 100%)';
 
-const feedback = [
-  {
-    id: 1,
-    name: 'Aanya Sharma',
-    location: 'Mumbai, India',
-    handle: '@aanya.sharma',
-    rating: 5,
-    product: 'Crimson Royal Saree',
-    text: "I wore this Prinsora lehenga to my sister's wedding and the compliments have not stopped. The quality of the zari work is truly breathtaking — every thread tells a story of incredible craftsmanship.",
-    avatar: av1,
-    verified: true,
-  },
-  {
-    id: 2,
-    name: 'Priya Mehta',
-    location: 'Delhi, India',
-    handle: '@priya.mehta',
-    rating: 5,
-    product: 'Emerald Zari Lehenga',
-    text: 'Prinsora understands luxury in the truest sense. My saree draped perfectly, the silk was extraordinarily soft, and the gold borders gleamed beautifully under the lights. Absolutely worth every rupee.',
-    avatar: av2,
-    verified: true,
-  },
-  {
-    id: 3,
-    name: 'Zara Khan',
-    location: 'Bangalore, India',
-    handle: '@zara.k',
-    rating: 5,
-    product: 'Golden Silk Royal Saree',
-    text: 'The Golden Silk saree I purchased is a work of art. The way it shimmered in the evening light was magical. Prinsora truly delivers on its promise of luxury and heritage. I felt like royalty.',
-    avatar: modelAvatar,
-    verified: true,
-  },
-];
-
 export function Testimonials() {
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/reviews')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.reviews.length > 0) {
+          setReviews(data.reviews.slice(0, 6)); // Show latest 6
+        }
+      })
+      .catch(err => console.error('Failed to fetch stories:', err))
+      .finally(() => setIsLoading(false));
+  }, []);
+
+  // Static fallbacks if no dynamic reviews exist yet
+  const fallbackFeedback = [
+    {
+      userName: 'Aanya Sharma',
+      location: 'Mumbai, India',
+      rating: 5,
+      comment: "I wore this Prinsora lehenga to my sister's wedding and the compliments have not stopped. The quality is truly breathtaking.",
+      imageUrl: '',
+      timestamp: '2 days ago'
+    },
+    {
+      userName: 'Priya Mehta',
+      location: 'Delhi, India',
+      rating: 5,
+      comment: 'Prinsora understands luxury in the truest sense. My saree draped perfectly, the silk was extraordinarily soft.',
+      imageUrl: '',
+      timestamp: '1 week ago'
+    },
+    {
+      userName: 'Zara Khan',
+      location: 'Bangalore, India',
+      rating: 5,
+      comment: 'The Golden Silk saree I purchased is a work of art. The way it shimmered in the evening light was magical.',
+      imageUrl: '',
+      timestamp: '3 days ago'
+    }
+  ];
+
+  const displayReviews = reviews.length > 0 ? reviews : fallbackFeedback;
+
   return (
     <section className="py-24 relative overflow-hidden" style={{ background: '#fff' }}>
       {/* Gold watermark */}
@@ -55,15 +63,7 @@ export function Testimonials() {
       >
         STORIES
       </div>
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            'radial-gradient(ellipse 70% 50% at 50% 100%, hsl(45 80% 60% / 0.05), transparent)',
-        }}
-      />
-      <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-yellow-400/40 to-transparent" />
-
+      
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         <motion.div
           className="text-center mb-16"
@@ -98,120 +98,70 @@ export function Testimonials() {
           />
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
-          {feedback.map((item, index) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {displayReviews.map((item, index) => (
             <motion.div
-              key={item.id}
-              data-testid={`testimonial-card-${item.id}`}
-              className="flex flex-col rounded-2xl overflow-hidden cursor-pointer"
+              key={index}
+              className="flex flex-col rounded-2xl overflow-hidden group"
               style={{
                 background: '#fff',
-                border: '1px solid hsl(45 70% 55% / 0.18)',
-                boxShadow: '0 6px 30px hsl(45 70% 55% / 0.1)',
+                border: '1px solid hsl(45 70% 55% / 0.15)',
+                boxShadow: '0 10px 40px hsl(45 70% 55% / 0.08)',
               }}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-80px' }}
-              transition={{ duration: 0.6, delay: index * 0.15 }}
-              whileHover={{
-                y: -6,
-                boxShadow: '0 20px 60px hsl(45 70% 55% / 0.22)',
-              }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              whileHover={{ y: -10, boxShadow: '0 20px 60px hsl(45 70% 55% / 0.15)' }}
             >
-              {/* Customer Photo Header */}
-              <div
-                className="relative h-48 overflow-hidden relative"
-                style={{ background: 'hsl(38 60% 92%)' }}
-              >
-                <AppImage
-                  src={item.avatar}
-                  alt={item.name}
-                  fill
-                  className="object-cover object-top"
-                  style={{ filter: 'brightness(0.98)' }}
-                />
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background:
-                      'linear-gradient(to bottom, transparent 60%, rgba(255,255,255,0.15) 100%)',
-                  }}
-                />
+              {item.imageUrl ? (
+                <div className="relative h-64 overflow-hidden">
+                  <AppImage
+                    src={item.imageUrl}
+                    alt={item.userName}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                </div>
+              ) : (
+                <div className="h-4 w-full bg-accent/5" />
+              )}
 
-                {/* Stars overlay */}
-                <div className="absolute top-3 left-3 flex gap-0.5">
-                  {Array.from({ length: item.rating }).map((_, i) => (
+              <div className="p-8 flex flex-col flex-1">
+                <Quote className="w-8 h-8 mb-6 opacity-20" style={{ color: 'hsl(45 70% 55%)' }} />
+                
+                <div className="flex gap-1 mb-4">
+                  {Array.from({ length: 5 }).map((_, i) => (
                     <Star
                       key={i}
                       className="w-3.5 h-3.5"
                       style={{
-                        fill: 'hsl(38 85% 52%)',
+                        fill: i < (item.rating || 5) ? 'hsl(38 85% 52%)' : 'transparent',
                         color: 'hsl(38 85% 52%)',
-                        filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))',
                       }}
                     />
                   ))}
                 </div>
 
-                {/* Verified badge */}
-                {item.verified && (
-                  <div
-                    className="absolute top-3 right-3 px-2 py-0.5 rounded-full text-[10px] font-bold"
-                    style={{ background: 'hsl(45 70% 55%)', color: '#1a0f08' }}
-                  >
-                    ✓ Verified
-                  </div>
-                )}
-              </div>
-
-              {/* Content */}
-              <div className="flex flex-col flex-1 p-6 gap-4">
-                {/* Quote icon */}
-                <Quote className="w-6 h-6" style={{ color: 'hsl(45 70% 55% / 0.4)' }} />
-
-                {/* Review text */}
-                <p
-                  className="leading-relaxed font-light text-sm flex-1"
-                  style={{ color: '#4a3020' }}
-                >
-                  &ldquo;{item.text}&rdquo;
+                <p className="text-zinc-700 leading-relaxed italic mb-8 flex-1 text-sm font-light">
+                  &ldquo;{item.comment}&rdquo;
                 </p>
 
-                {/* Product purchased */}
-                <div className="flex items-center gap-2">
-                  <div className="w-1 h-1 rounded-full" style={{ background: 'hsl(45 70% 55%)' }} />
-                  <span
-                    className="text-[11px] font-medium tracking-wide"
-                    style={{ color: 'hsl(38 70% 45%)' }}
-                  >
-                    Purchased: {item.product}
-                  </span>
-                </div>
-
-                {/* Author */}
-                <div
-                  className="flex items-center justify-between pt-3"
-                  style={{ borderTop: '1px solid hsl(45 70% 55% / 0.15)' }}
-                >
+                <div className="flex items-center justify-between pt-6 border-t border-zinc-100">
                   <div>
-                    <p className="font-semibold font-serif text-sm" style={{ color: '#1a0f08' }}>
-                      {item.name}
-                    </p>
-                    <p className="text-xs" style={{ color: '#8a6040' }}>
-                      {item.location}
-                    </p>
+                    <h4 className="font-serif font-bold text-zinc-900">{item.userName}</h4>
+                    <p className="text-[10px] text-zinc-400 uppercase tracking-widest">{item.location || 'Verified Buyer'}</p>
                   </div>
-                  <span className="text-[11px]" style={{ color: 'hsl(45 60% 55%)' }}>
-                    {item.handle}
-                  </span>
+                  <div className="text-[10px] text-accent font-bold px-2 py-1 rounded bg-accent/5 border border-accent/10">
+                    PRINSORA MUSE
+                  </div>
                 </div>
               </div>
             </motion.div>
           ))}
         </div>
       </div>
-
-      <div className="absolute bottom-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-yellow-400/30 to-transparent" />
     </section>
   );
 }

@@ -54,9 +54,28 @@ export default function CheckoutPage() {
   const [upi, setUpi] = useState('');
   const [cashfree, setCashfree] = useState<any>(null);
 
+  // Coupon States
+  const [couponInput, setCouponInput] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
+  const [validatingCoupon, setValidatingCoupon] = useState(false);
+  const [couponError, setCouponError] = useState('');
+
+
   const shipping = total >= 25000 ? 0 : 499;
   const tax = Math.round(total * 0.18);
-  const grandTotal = total + shipping + tax;
+  
+  // Calculate discount
+  let discountAmount = 0;
+  if (appliedCoupon) {
+    if (appliedCoupon.type === 'percentage') {
+      discountAmount = Math.round(total * (appliedCoupon.value / 100));
+    } else {
+      discountAmount = appliedCoupon.value;
+    }
+  }
+
+  const grandTotal = Math.max(0, total + shipping + tax - discountAmount);
+
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.Cashfree) {
@@ -175,6 +194,31 @@ export default function CheckoutPage() {
       setPlacing(false);
     }
   };
+
+  const handleApplyCoupon = async () => {
+    if (!couponInput) return;
+    setValidatingCoupon(true);
+    setCouponError('');
+    try {
+      const res = await fetch('/api/checkout/validate-coupon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: couponInput }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAppliedCoupon(data.promo);
+        setCouponInput('');
+      } else {
+        setCouponError(data.error || 'Invalid code');
+      }
+    } catch (err) {
+      setCouponError('Error validating coupon');
+    } finally {
+      setValidatingCoupon(false);
+    }
+  };
+
 
   const formatCardNumber = (v: string) =>
     v
@@ -678,7 +722,44 @@ export default function CheckoutPage() {
                       ))}
                     </div>
                     <div className="h-px mb-4" style={{ background: 'hsl(45 70% 55% / 0.2)' }} />
+                    
+                    {/* Coupon Input */}
+                    {!appliedCoupon ? (
+                      <div className="mb-5">
+                        <div className="flex gap-2">
+                          <input 
+                            value={couponInput}
+                            onChange={(e) => setCouponInput(e.target.value)}
+                            placeholder="Promo Code"
+                            className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-accent/50"
+                          />
+                          <button 
+                            onClick={handleApplyCoupon}
+                            disabled={validatingCoupon || !couponInput}
+                            className="px-4 py-2 rounded-lg bg-accent text-primary text-xs font-bold disabled:opacity-50"
+                          >
+                            {validatingCoupon ? '...' : 'Apply'}
+                          </button>
+                        </div>
+                        {couponError && <p className="text-[10px] text-red-400 mt-1">{couponError}</p>}
+                      </div>
+                    ) : (
+                      <div className="mb-5 flex justify-between items-center bg-accent/5 border border-accent/20 rounded-lg px-3 py-2">
+                        <div>
+                          <p className="text-[10px] text-accent font-bold uppercase tracking-wider">Applied Coupon</p>
+                          <p className="text-sm text-white font-medium">{appliedCoupon.code}</p>
+                        </div>
+                        <button 
+                          onClick={() => setAppliedCoupon(null)}
+                          className="text-[10px] text-zinc-500 hover:text-white underline"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    )}
+
                     <div className="flex flex-col gap-2 text-sm mb-4">
+
                       <div className="flex justify-between">
                         <span style={{ color: 'hsl(38 30% 55%)' }}>Subtotal</span>
                         <span style={{ color: '#f5f0e8' }}>{formatPrice(total)}</span>
@@ -693,7 +774,14 @@ export default function CheckoutPage() {
                         <span style={{ color: 'hsl(38 30% 55%)' }}>GST (18%)</span>
                         <span style={{ color: '#f5f0e8' }}>{formatPrice(tax)}</span>
                       </div>
+                      {appliedCoupon && (
+                        <div className="flex justify-between">
+                          <span className="text-accent">Discount</span>
+                          <span className="text-accent">-{formatPrice(discountAmount)}</span>
+                        </div>
+                      )}
                     </div>
+
                     <div className="h-px mb-4" style={{ background: 'hsl(45 70% 55% / 0.2)' }} />
                     <div className="flex justify-between items-center">
                       <span className="font-semibold" style={{ color: '#f5f0e8' }}>

@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const scriptUrl = process.env.GOOGLE_APPS_SCRIPT_URL;
+    const { searchParams } = new URL(req.url);
+    const email = searchParams.get('email');
 
+    if (!email) {
+      return NextResponse.json({ success: false, error: 'Email is required' }, { status: 400 });
+    }
+
+    const scriptUrl = process.env.GOOGLE_APPS_SCRIPT_URL;
     if (!scriptUrl) {
       throw new Error('GOOGLE_APPS_SCRIPT_URL not set');
     }
@@ -19,14 +25,10 @@ export async function GET() {
       }),
     });
 
-    const ordersData = await ordersRes.json().catch((e) => {
-      console.error('Orders JSON Parse Error:', e);
-      return { success: false, error: 'Bridge returned invalid response for Orders' };
-    });
+    const ordersData = await ordersRes.json().catch(() => ({ success: false }));
 
     if (!ordersData.success) {
-      console.error('Orders Bridge Error:', ordersData.error);
-      return NextResponse.json({ success: false, error: ordersData.error || 'Failed to fetch orders' }, { status: 500 });
+      return NextResponse.json({ success: false, error: 'Failed to fetch orders from bridge' }, { status: 500 });
     }
 
     // 2. Fetch Order Items (Line items)
@@ -60,16 +62,16 @@ export async function GET() {
       }
     }
 
-    // Map items to order IDs
+    // Map items to order IDs (trimming to avoid mismatch)
     const itemsByOrder: Record<string, any[]> = {};
     itemRows.forEach((row: any) => {
       if (Array.isArray(row) && row.length >= 2) {
-        const oid = row[1]?.toString();
+        const oid = row[1]?.toString().trim();
         if (oid) {
           if (!itemsByOrder[oid]) itemsByOrder[oid] = [];
           itemsByOrder[oid].push({
-            name: row[2] || 'Unnamed Item',
-            size: row[3] || 'N/A',
+            name: (row[2] || 'Unnamed Item').toString().trim(),
+            size: (row[3] || 'N/A').toString().trim(),
             quantity: parseInt(row[4]) || 0,
             price: parseFloat(row[5]) || 0,
             total: parseFloat(row[6]) || 0,
@@ -78,10 +80,11 @@ export async function GET() {
       }
     });
 
+    // Filter by Email and map
     const orders = orderRows
-      .filter((row: any) => Array.isArray(row) && row.length >= 2)
+      .filter((row: any) => Array.isArray(row) && row.length >= 5 && row[4]?.toString().trim().toLowerCase() === email.toLowerCase())
       .map((row: any) => {
-        const orderId = row[1]?.toString() || 'N/A';
+        const orderId = row[1]?.toString().trim() || 'N/A';
         return {
           date: row[0],
           id: orderId,
@@ -91,7 +94,7 @@ export async function GET() {
           address: row[5] || 'N/A',
           total: parseFloat(row[6]) || 0,
           payment: row[7] || 'N/A',
-          status: row[8] || 'Confirmed',
+          status: (row[8] || 'Confirmed').toString().trim(),
           trackingId: row[9] || '',
           items: itemsByOrder[orderId] || [],
         };
@@ -105,7 +108,7 @@ export async function GET() {
 
     return NextResponse.json({ success: true, orders });
   } catch (error: any) {
-    console.error('Fetch Orders Error:', error);
+    console.error('Fetch User Orders Error:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
